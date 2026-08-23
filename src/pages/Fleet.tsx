@@ -8,11 +8,10 @@ import type { Car } from '../types';
 
 export default function Fleet() {
   const { cars } = useFleetStore();
-  const { isAuthenticated } = useAuthStore();
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [interceptMessage, setInterceptMessage] = useState('');
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const interceptMessage = '';
   
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
