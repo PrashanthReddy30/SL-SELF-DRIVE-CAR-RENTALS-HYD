@@ -40,13 +40,15 @@ export default function AdminInquiries() {
                       </div>
                     </td>
                     <td className="py-6 px-6">
-                      {inquiry.carName && (
-                        <div className="mb-3">
-                          <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">
-                            Enquiry for: {inquiry.carName}
-                          </span>
+                      {(inquiry.carName || inquiry.preferredDate) && (
+                        <div className="mb-3 flex gap-2 flex-wrap">
+                          {inquiry.carName && (
+                            <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">
+                              Enquiry for: {inquiry.carName}
+                            </span>
+                          )}
                           {inquiry.preferredDate && (
-                            <span className="inline-block ml-2 bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold border border-slate-200">
+                            <span className="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold border border-slate-200">
                               Date: {new Date(inquiry.preferredDate).toLocaleDateString()}
                             </span>
                           )}
