@@ -3,6 +3,8 @@ import { Heart, Search, Filter } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import AuthModal from '../components/auth/AuthModal';
+import BookingModal from '../components/booking/BookingModal';
+import type { Car } from '../types';
 
 export default function Fleet() {
   const { cars } = useFleetStore();
@@ -10,6 +12,7 @@ export default function Fleet() {
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [interceptMessage, setInterceptMessage] = useState('');
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
@@ -18,13 +21,12 @@ export default function Fleet() {
     setWishlist(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleRentNow = () => {
+  const handleRentNow = (car: Car) => {
     if (!isAuthenticated) {
       setInterceptMessage('Please login or sign up to book a car.');
       setIsAuthModalOpen(true);
     } else {
-      // In a real app, go to checkout / booking page
-      alert('Proceeding to checkout...');
+      setSelectedCar(car);
     }
   };
 
@@ -110,7 +112,7 @@ export default function Fleet() {
                     <span className="text-gray-500 text-sm">/day</span>
                   </div>
                   <button 
-                    onClick={handleRentNow}
+                    onClick={() => handleRentNow(car)}
                     className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm"
                   >
                     Rent Now
@@ -132,6 +134,11 @@ export default function Fleet() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         interceptMessage={interceptMessage}
+      />
+      <BookingModal 
+        isOpen={!!selectedCar}
+        onClose={() => setSelectedCar(null)}
+        car={selectedCar}
       />
     </div>
   );

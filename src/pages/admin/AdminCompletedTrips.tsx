@@ -41,8 +41,8 @@ export default function AdminCompletedTrips() {
                             <User size={16} />
                           </div>
                           <div>
-                            <p className="font-semibold text-sm text-secondary">User {b.userId.slice(0,4)}</p>
-                            <a href="tel:+910000000000" className="text-xs text-primary flex items-center gap-1 hover:underline"><Phone size={10} /> +91 0000000000</a>
+                            <p className="font-semibold text-sm text-secondary">{b.customerName}</p>
+                            <a href={`tel:${b.customerPhone}`} className="text-xs text-primary flex items-center gap-1 hover:underline"><Phone size={10} /> {b.customerPhone}</a>
                           </div>
                         </div>
                       </td>

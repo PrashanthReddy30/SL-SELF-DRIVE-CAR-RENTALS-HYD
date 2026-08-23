@@ -25,7 +25,10 @@ export type BookingStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
 export interface Booking {
   id: string;
   carId: string;
-  userId: string;
+  userId?: string;
+  customerName: string;
+  customerPhone: string;
+  aadharNumber: string;
   startDate: string; // ISO string
   endDate: string; // ISO string
   pickupLocation: string;
