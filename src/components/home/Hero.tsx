@@ -1,4 +1,3 @@
-import { MapPin, Calendar } from 'lucide-react';
 
 export default function Hero() {
   return (
