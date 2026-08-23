@@ -6,7 +6,7 @@ export default function AdminLayout() {
   const { user, isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated || user?.role !== 'admin') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return (

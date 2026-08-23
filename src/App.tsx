@@ -11,6 +11,7 @@ const Team = () => <div className="p-8"><h1 className="text-3xl font-bold">Team<
 const FAQ = () => <div className="p-8"><h1 className="text-3xl font-bold">FAQ</h1></div>;
 const Contact = () => <div className="p-8"><h1 className="text-3xl font-bold">Contact</h1></div>;
 
+import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCars from './pages/admin/AdminCars';
 import AdminBookings from './pages/admin/AdminBookings';
@@ -32,6 +33,8 @@ function App() {
         </Route>
 
         {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="cars" element={<AdminCars />} />

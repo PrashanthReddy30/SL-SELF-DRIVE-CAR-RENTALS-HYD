@@ -49,12 +49,6 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="text-secondary font-bold hover:text-primary transition-colors px-3 py-2 flex items-center gap-1 border-r border-gray-200 pr-4"
-                >
-                  Admin Login
-                </button>
-                <button 
-                  onClick={() => setIsAuthModalOpen(true)}
                   className="text-secondary font-medium hover:text-primary transition-colors px-3 py-2"
                 >
                   Login
