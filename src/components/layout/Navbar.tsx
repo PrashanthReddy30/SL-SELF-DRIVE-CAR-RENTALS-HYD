@@ -34,14 +34,6 @@ export default function Navbar() {
             <Link to="/team" className="text-gray-700 hover:text-primary font-medium transition-colors">Team</Link>
             <Link to="/faq" className="text-gray-700 hover:text-primary font-medium transition-colors">FAQ</Link>
             <Link to="/contact" className="text-gray-700 hover:text-primary font-medium transition-colors">Contact</Link>
-            {user?.role !== 'admin' && (
-              <button 
-                onClick={() => setIsAuthModalOpen(true)} 
-                className="text-primary font-bold hover:text-primary-hover transition-colors flex items-center gap-1"
-              >
-                Admin Login
-              </button>
-            )}
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -55,6 +47,12 @@ export default function Navbar() {
 
             {!isAuthenticated ? (
               <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="text-secondary font-bold hover:text-primary transition-colors px-3 py-2 flex items-center gap-1 border-r border-gray-200 pr-4"
+                >
+                  Admin Login
+                </button>
                 <button 
                   onClick={() => setIsAuthModalOpen(true)}
                   className="text-secondary font-medium hover:text-primary transition-colors px-3 py-2"
