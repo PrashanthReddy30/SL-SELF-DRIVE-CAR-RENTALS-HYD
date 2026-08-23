@@ -11,7 +11,7 @@ import {
 export default function AdminSidebar() {
   const navItems = [
     { name: 'Dashboard', path: '/admin', end: true, icon: LayoutDashboard },
-    { name: 'Rental Cars', path: '/admin/fleet', icon: CarFront },
+    { name: 'Rental Cars', path: '/admin/cars', icon: CarFront },
     { name: 'Bookings', path: '/admin/bookings', icon: CalendarDays },
     { name: 'Completed Trips', path: '/admin/completed-trips', icon: CheckCircle2 },
     { name: 'Inquiries', path: '/admin/inquiries', icon: MessageSquare },

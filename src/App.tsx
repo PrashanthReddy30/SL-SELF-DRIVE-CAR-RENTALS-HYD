@@ -13,7 +13,7 @@ const FAQ = () => <div className="p-8"><h1 className="text-3xl font-bold">FAQ</h
 
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminFleet from './pages/admin/AdminFleet';
+import AdminCars from './pages/admin/AdminCars';
 import AdminBookings from './pages/admin/AdminBookings';
 import AdminCompletedTrips from './pages/admin/AdminCompletedTrips';
 import AdminInquiries from './pages/admin/AdminInquiries';
@@ -38,7 +38,7 @@ function App() {
         
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="fleet" element={<AdminFleet />} />
+          <Route path="cars" element={<AdminCars />} />
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="completed-trips" element={<AdminCompletedTrips />} />
           <Route path="inquiries" element={<AdminInquiries />} />
