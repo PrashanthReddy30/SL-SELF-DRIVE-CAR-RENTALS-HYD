@@ -47,6 +47,12 @@ export default function Navbar() {
 
             {!isAuthenticated ? (
               <div className="flex items-center gap-3">
+                <Link 
+                  to="/admin/login"
+                  className="text-secondary font-bold hover:text-primary transition-colors px-3 py-2 flex items-center gap-1 border-r border-gray-200 pr-4"
+                >
+                  Admin Login
+                </Link>
                 <button 
                   onClick={() => setIsAuthModalOpen(true)}
                   className="text-secondary font-medium hover:text-primary transition-colors px-3 py-2"
@@ -133,6 +139,13 @@ export default function Navbar() {
             <div className="mt-6 pt-6 border-t border-gray-200">
               {!isAuthenticated ? (
                 <div className="flex flex-col gap-3 px-3">
+                  <Link 
+                    to="/admin/login"
+                    className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors text-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Admin Login
+                  </Link>
                   <button 
                     onClick={() => { setIsAuthModalOpen(true); setIsMenuOpen(false); }}
                     className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors"
