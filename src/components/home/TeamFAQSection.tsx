@@ -82,7 +82,6 @@ export default function TeamFAQSection() {
           </form>
         </div>
 
-      </div>
-    </section>
+      </section>
   );
 }
