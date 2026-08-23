@@ -9,10 +9,6 @@ export default function Hero() {
           {/* Left Column: Search Form */}
           <div className="w-full lg:w-5/12 z-10">
             <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-              <h1 className="text-3xl lg:text-4xl font-bold text-secondary mb-2 tracking-tight">
-                Find your perfect rental car today.
-              </h1>
-              <p className="text-gray-500 mb-8">Premium vehicles for any occasion.</p>
               
               <form className="space-y-4">
                 <div>
