@@ -5,6 +5,8 @@ export interface Inquiry {
   name: string;
   email: string;
   phone: string;
+  carName?: string;
+  preferredDate?: string;
   message: string;
   status: 'Unread' | 'Read' | 'Resolved';
   createdAt: string;

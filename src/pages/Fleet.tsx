@@ -3,6 +3,7 @@ import { Heart, Search, Filter } from 'lucide-react';
 import { useState } from 'react';
 import AuthModal from '../components/auth/AuthModal';
 import BookingModal from '../components/booking/BookingModal';
+import EnquiryModal from '../components/booking/EnquiryModal';
 import type { Car } from '../types';
 
 export default function Fleet() {
@@ -10,6 +11,7 @@ export default function Fleet() {
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [enquiryCar, setEnquiryCar] = useState<Car | null>(null);
   const interceptMessage = '';
   
   const [search, setSearch] = useState('');
@@ -104,12 +106,20 @@ export default function Fleet() {
                     <span className="text-2xl font-bold text-secondary">₹{car.pricePerDay.toLocaleString()}</span>
                     <span className="text-gray-500 text-sm">/day</span>
                   </div>
-                  <button 
-                    onClick={() => handleRentNow(car)}
-                    className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm"
-                  >
-                    Rent Now
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setEnquiryCar(car)}
+                      className="bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-bold hover:bg-slate-200 transition-colors shadow-sm"
+                    >
+                      Enquire
+                    </button>
+                    <button 
+                      onClick={() => handleRentNow(car)}
+                      className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm"
+                    >
+                      Rent Now
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -132,6 +142,11 @@ export default function Fleet() {
         isOpen={!!selectedCar}
         onClose={() => setSelectedCar(null)}
         car={selectedCar}
+      />
+      <EnquiryModal 
+        isOpen={!!enquiryCar}
+        onClose={() => setEnquiryCar(null)}
+        car={enquiryCar}
       />
     </div>
   );
