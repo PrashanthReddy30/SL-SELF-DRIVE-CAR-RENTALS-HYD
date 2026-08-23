@@ -34,6 +34,11 @@ export default function Navbar() {
             <Link to="/team" className="text-gray-700 hover:text-primary font-medium transition-colors">Team</Link>
             <Link to="/faq" className="text-gray-700 hover:text-primary font-medium transition-colors">FAQ</Link>
             <Link to="/contact" className="text-gray-700 hover:text-primary font-medium transition-colors">Contact</Link>
+            {user?.role === 'admin' ? (
+              <Link to="/admin" className="bg-secondary text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-secondary/90 transition-colors">Admin</Link>
+            ) : (
+              <button onClick={() => setIsAuthModalOpen(true)} className="text-gray-700 hover:text-primary font-medium transition-colors">Admin Login</button>
+            )}
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
