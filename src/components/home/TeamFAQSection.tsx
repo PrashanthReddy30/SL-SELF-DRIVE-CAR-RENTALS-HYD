@@ -45,57 +45,30 @@ export default function TeamFAQSection() {
           </div>
         </div>
 
-        {/* FAQ & Blog Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* FAQ */}
-          <div>
+        {/* FAQ Section */}
+        <div className="max-w-3xl mx-auto mt-24">
+          <div className="text-center mb-10">
             <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Answers</span>
-            <h2 className="text-3xl font-bold text-secondary mb-8">Frequently Asked Questions</h2>
-            
-            <div className="space-y-4">
-              {faqs.map((faq, idx) => (
-                <div key={idx} className="border-b border-gray-100 pb-4">
-                  <button 
-                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                    className="w-full flex items-center justify-between py-4 text-left font-bold text-secondary hover:text-primary transition-colors"
-                  >
-                    {faq.q}
-                    {openFaq === idx ? <Minus size={20} className="text-primary" /> : <Plus size={20} className="text-gray-400" />}
-                  </button>
-                  <div className={`overflow-hidden transition-all duration-300 ${openFaq === idx ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <p className="text-gray-500 text-sm leading-relaxed pb-4">
-                      {faq.a}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-3xl font-bold text-secondary">Frequently Asked Questions</h2>
           </div>
-
-          {/* Blog News */}
-          <div>
-            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Updates</span>
-            <h2 className="text-3xl font-bold text-secondary mb-8">Latest Blog & News</h2>
-            
-            <div className="space-y-6">
-              {[
-                { title: 'Top Rental Tips for 2024', date: 'Oct 15, 2023', img: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=300' },
-                { title: 'Electric vs Gas: Which is better?', date: 'Nov 02, 2023', img: 'https://images.unsplash.com/photo-1593941707882-a5bba14938cb?auto=format&fit=crop&q=80&w=300' },
-              ].map((blog, idx) => (
-                <div key={idx} className="flex items-center gap-6 group cursor-pointer">
-                  <div className="w-32 h-24 rounded-2xl overflow-hidden shrink-0">
-                    <img src={blog.img} alt={blog.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  </div>
-                  <div>
-                    <span className="text-primary font-bold text-xs uppercase tracking-wider">{blog.date}</span>
-                    <h4 className="font-bold text-secondary text-lg mt-1 mb-2 group-hover:text-primary transition-colors">{blog.title}</h4>
-                    <span className="text-sm text-gray-500 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Read More <span className="text-primary">→</span>
-                    </span>
-                  </div>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="border-b border-gray-100 pb-4">
+                <button 
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full flex items-center justify-between py-4 text-left font-bold text-secondary hover:text-primary transition-colors"
+                >
+                  {faq.q}
+                  {openFaq === idx ? <Minus size={20} className="text-primary" /> : <Plus size={20} className="text-gray-400" />}
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ${openFaq === idx ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <p className="text-gray-500 text-sm leading-relaxed pb-4">
+                    {faq.a}
+                  </p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
