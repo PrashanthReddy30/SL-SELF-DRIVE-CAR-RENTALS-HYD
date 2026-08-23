@@ -10,36 +10,7 @@ interface BookingState {
   cancelBooking: (id: string) => void;
 }
 
-const initialBookings: Booking[] = [
-  {
-    id: 'b1',
-    carId: 'c1',
-    userId: '1',
-    customerName: 'Prashanth Reddy',
-    customerPhone: '+91 9876543210',
-    aadharNumber: '123456789012',
-    startDate: new Date(Date.now() + 86400000).toISOString(),
-    endDate: new Date(Date.now() + 86400000 * 3).toISOString(),
-    pickupLocation: 'Nagaram Main Road',
-    totalPrice: 13500,
-    status: 'Confirmed',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'b2',
-    carId: 'c2',
-    userId: '2',
-    customerName: 'Chinna Reddy',
-    customerPhone: '+91 8106698859',
-    aadharNumber: '987654321098',
-    startDate: new Date(Date.now() - 86400000 * 5).toISOString(),
-    endDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-    pickupLocation: 'Airport',
-    totalPrice: 75000,
-    status: 'Completed',
-    createdAt: new Date(Date.now() - 86400000 * 7).toISOString()
-  }
-];
+const initialBookings: Booking[] = [];
 
 export const useBookingStore = create<BookingState>()(
   persist(
@@ -57,7 +28,7 @@ export const useBookingStore = create<BookingState>()(
       })),
     }),
     {
-      name: 'sl-booking-storage',
+      name: 'sl-bookings-v2',
     }
   )
 );
