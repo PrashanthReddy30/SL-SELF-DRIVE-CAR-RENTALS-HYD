@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Mail, Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
@@ -12,6 +13,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', interceptMessage }: AuthModalProps) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuthStore();
@@ -40,6 +42,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
     setTimeout(() => toast.remove(), 3500);
 
     onClose();
+
+    // Redirect to admin dashboard if logging in as admin
+    if (role === 'admin') {
+      navigate('/admin');
+    }
   };
 
   return (
