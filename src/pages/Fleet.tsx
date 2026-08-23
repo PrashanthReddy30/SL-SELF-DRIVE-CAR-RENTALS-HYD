@@ -22,12 +22,7 @@ export default function Fleet() {
   };
 
   const handleRentNow = (car: Car) => {
-    if (!isAuthenticated) {
-      setInterceptMessage('Please login or sign up to book a car.');
-      setIsAuthModalOpen(true);
-    } else {
-      setSelectedCar(car);
-    }
+    setSelectedCar(car);
   };
 
   const categories = ['All', 'Sedan', 'SUV', 'Luxury', 'Sports'];
