@@ -29,10 +29,10 @@ export const useInquiryStore = create<InquiryState>((set, get) => ({
   initialize: () => {
     if (get().isInitialized) return;
     
-    const unsubscribe = onSnapshot(collection(db, 'inquiries'), (snapshot) => {
-      const inquiriesData = snapshot.docs.map(doc => doc.data() as Inquiry);
+    const _unsubscribe = onSnapshot(collection(db, 'inquiries'), (snapshot: any) => {
+      const inquiriesData = snapshot.docs.map((doc: any) => doc.data() as Inquiry);
       // Sort by createdAt descending
-      inquiriesData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      inquiriesData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       set({ inquiries: inquiriesData });
     });

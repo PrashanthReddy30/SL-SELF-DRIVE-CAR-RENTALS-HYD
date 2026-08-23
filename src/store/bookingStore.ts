@@ -20,10 +20,10 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   initialize: () => {
     if (get().isInitialized) return;
     
-    const unsubscribe = onSnapshot(collection(db, 'bookings'), (snapshot) => {
-      const bookingsData = snapshot.docs.map(doc => doc.data() as Booking);
+    const _unsubscribe = onSnapshot(collection(db, 'bookings'), (snapshot: any) => {
+      const bookingsData = snapshot.docs.map((doc: any) => doc.data() as Booking);
       // Sort by createdAt descending
-      bookingsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      bookingsData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       set({ bookings: bookingsData });
     });
