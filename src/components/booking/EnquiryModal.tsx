@@ -28,6 +28,11 @@ export default function EnquiryModal({ isOpen, onClose, car }: EnquiryModalProps
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.name || !formData.phone) {
+      alert("Please provide your name and phone number.");
+      return;
+    }
     
     addInquiry({
       id: Date.now().toString(),
@@ -86,7 +91,6 @@ export default function EnquiryModal({ isOpen, onClose, car }: EnquiryModalProps
                     </label>
                     <input 
                       type="text" 
-                      required
                       value={formData.name}
                       onChange={e => setFormData({...formData, name: e.target.value})}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
@@ -100,7 +104,6 @@ export default function EnquiryModal({ isOpen, onClose, car }: EnquiryModalProps
                     </label>
                     <input 
                       type="tel" 
-                      required
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
@@ -114,8 +117,6 @@ export default function EnquiryModal({ isOpen, onClose, car }: EnquiryModalProps
                     </label>
                     <input 
                       type="date" 
-                      required
-                      min={new Date().toISOString().split('T')[0]}
                       value={formData.preferredDate}
                       onChange={e => setFormData({...formData, preferredDate: e.target.value})}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 

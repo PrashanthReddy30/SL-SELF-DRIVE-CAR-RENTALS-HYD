@@ -18,6 +18,11 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.name || !formData.phone || !formData.message) {
+      alert("Please provide your name, phone number, and message.");
+      return;
+    }
     
     addInquiry({
       id: Date.now().toString(),
@@ -100,7 +105,6 @@ export default function Contact() {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
                     <input 
                       type="text" 
-                      required
                       value={formData.name}
                       onChange={e => setFormData({...formData, name: e.target.value})}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
@@ -111,7 +115,6 @@ export default function Contact() {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
                     <input 
                       type="tel" 
-                      required
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
@@ -124,7 +127,6 @@ export default function Contact() {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                   <input 
                     type="email" 
-                    required
                     value={formData.email}
                     onChange={e => setFormData({...formData, email: e.target.value})}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
@@ -135,7 +137,6 @@ export default function Contact() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Your Message</label>
                   <textarea 
-                    required
                     rows={5}
                     value={formData.message}
                     onChange={e => setFormData({...formData, message: e.target.value})}
