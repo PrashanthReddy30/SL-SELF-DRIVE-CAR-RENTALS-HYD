@@ -34,11 +34,6 @@ export default function Navbar() {
             <Link to="/team" className="text-gray-700 hover:text-primary font-medium transition-colors">Team</Link>
             <Link to="/faq" className="text-gray-700 hover:text-primary font-medium transition-colors">FAQ</Link>
             <Link to="/contact" className="text-gray-700 hover:text-primary font-medium transition-colors">Contact</Link>
-            {user?.role === 'admin' ? (
-              <Link to="/admin" className="bg-secondary text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-secondary/90 transition-colors">Admin</Link>
-            ) : (
-              <button onClick={() => setIsAuthModalOpen(true)} className="text-gray-700 hover:text-primary font-medium transition-colors">Admin Login</button>
-            )}
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -69,44 +64,41 @@ export default function Navbar() {
               <div className="relative">
                 <button 
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 border border-gray-200 pl-2 pr-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 border border-gray-200 pl-2 pr-3 py-1.5 rounded-full hover:bg-primary/5 transition-colors group"
                 >
-                  {user?.role === 'admin' ? (
-                    <>
-                      <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center text-sm font-bold">
-                        A
-                      </div>
-                      <span className="font-semibold text-sm text-secondary">Admin ⌄</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserCircle size={32} className="text-gray-400" />
-                      <span className="font-semibold text-sm text-gray-700">{user?.name.split(' ')[0]} ⌄</span>
-                    </>
-                  )}
+                  <UserCircle size={28} className="text-primary group-hover:text-primary-hover transition-colors" />
+                  <span className="font-semibold text-sm text-secondary">
+                    {user?.role === 'admin' ? 'Admin' : user?.name.split(' ')[0]} ⌄
+                  </span>
                 </button>
                 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 flex flex-col z-50">
-                    {user?.role === 'admin' ? (
-                      <Link to="/admin" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                        <LayoutDashboard size={16} className="text-primary" />
+                  <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 flex flex-col z-50">
+                    <div className="px-4 py-3 border-b border-gray-100 mb-1">
+                      <p className="text-sm font-bold text-secondary">{user?.role === 'admin' ? 'Admin' : user?.name}</p>
+                      <p className="text-xs text-gray-500 font-medium truncate mt-0.5">{user?.email}</p>
+                    </div>
+
+                    {user?.role === 'admin' && (
+                      <Link to="/admin" className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-3 transition-colors">
+                        <LayoutDashboard size={18} />
                         Admin Dashboard
                       </Link>
-                    ) : (
-                      <Link to="/profile" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                        <Settings size={16} className="text-gray-400" />
-                        My Bookings
-                      </Link>
                     )}
+                    
+                    <Link to="/profile" className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-3 transition-colors">
+                      <Settings size={18} />
+                      My Bookings
+                    </Link>
+                    
                     <button 
                       onClick={() => {
                         logout();
                         setIsDropdownOpen(false);
                       }} 
-                      className="px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center gap-2 text-left"
+                      className="px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-3 text-left transition-colors mt-1 border-t border-gray-50"
                     >
-                      <LogOut size={16} />
+                      <LogOut size={18} />
                       Logout
                     </button>
                   </div>
