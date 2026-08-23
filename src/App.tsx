@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import AdminLayout from './components/layout/AdminLayout';
@@ -17,8 +18,14 @@ import AdminCars from './pages/admin/AdminCars';
 import AdminBookings from './pages/admin/AdminBookings';
 import AdminCompletedTrips from './pages/admin/AdminCompletedTrips';
 import AdminInquiries from './pages/admin/AdminInquiries';
+import { useInquiryStore } from './store/inquiryStore';
+import { useBookingStore } from './store/bookingStore';
 
 function App() {
+  useEffect(() => {
+    useInquiryStore.getState().initialize();
+    useBookingStore.getState().initialize();
+  }, []);
   return (
     <Router>
       <Routes>

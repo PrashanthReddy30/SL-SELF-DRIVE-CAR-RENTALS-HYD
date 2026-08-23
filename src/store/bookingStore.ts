@@ -1,34 +1,49 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import type { Booking } from '../types';
 
 interface BookingState {
   bookings: Booking[];
-  addBooking: (booking: Booking) => void;
-  updateBookingStatus: (id: string, status: Booking['status']) => void;
-  updateAdminNote: (id: string, note: string) => void;
-  cancelBooking: (id: string) => void;
+  isInitialized: boolean;
+  initialize: () => void;
+  addBooking: (booking: Booking) => Promise<void>;
+  updateBookingStatus: (id: string, status: Booking['status']) => Promise<void>;
+  updateAdminNote: (id: string, note: string) => Promise<void>;
+  cancelBooking: (id: string) => Promise<void>;
 }
 
-const initialBookings: Booking[] = [];
+export const useBookingStore = create<BookingState>((set, get) => ({
+  bookings: [],
+  isInitialized: false,
 
-export const useBookingStore = create<BookingState>()(
-  persist(
-    (set) => ({
-      bookings: initialBookings,
-      addBooking: (booking) => set((state) => ({ bookings: [...state.bookings, booking] })),
-      updateBookingStatus: (id, status) => set((state) => ({
-        bookings: state.bookings.map(b => b.id === id ? { ...b, status } : b)
-      })),
-      updateAdminNote: (id, adminNote) => set((state) => ({
-        bookings: state.bookings.map(b => b.id === id ? { ...b, adminNote } : b)
-      })),
-      cancelBooking: (id) => set((state) => ({
-        bookings: state.bookings.map(b => b.id === id ? { ...b, status: 'Cancelled' } : b)
-      })),
-    }),
-    {
-      name: 'sl-bookings-v2',
-    }
-  )
-);
+  initialize: () => {
+    if (get().isInitialized) return;
+    
+    const unsubscribe = onSnapshot(collection(db, 'bookings'), (snapshot) => {
+      const bookingsData = snapshot.docs.map(doc => doc.data() as Booking);
+      // Sort by createdAt descending
+      bookingsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      set({ bookings: bookingsData });
+    });
+
+    set({ isInitialized: true });
+  },
+
+  addBooking: async (booking) => {
+    await setDoc(doc(db, 'bookings', booking.id), booking);
+  },
+
+  updateBookingStatus: async (id, status) => {
+    await updateDoc(doc(db, 'bookings', id), { status });
+  },
+
+  updateAdminNote: async (id, adminNote) => {
+    await updateDoc(doc(db, 'bookings', id), { adminNote });
+  },
+
+  cancelBooking: async (id) => {
+    await updateDoc(doc(db, 'bookings', id), { status: 'Cancelled' });
+  },
+}));
