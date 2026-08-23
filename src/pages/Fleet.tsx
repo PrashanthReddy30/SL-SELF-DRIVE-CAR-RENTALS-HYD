@@ -1,7 +1,6 @@
 import { useFleetStore } from '../store/fleetStore';
 import { Heart, Search, Filter } from 'lucide-react';
 import { useState } from 'react';
-import { useAuthStore } from '../store/authStore';
 import AuthModal from '../components/auth/AuthModal';
 import BookingModal from '../components/booking/BookingModal';
 import type { Car } from '../types';
