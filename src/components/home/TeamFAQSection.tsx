@@ -1,3 +1,5 @@
+import { User, Phone, CalendarDays } from 'lucide-react';
+
 export default function TeamFAQSection() {
   const team = [
     { name: 'John Walker', role: 'CEO & Founder', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400' },
@@ -31,7 +33,55 @@ export default function TeamFAQSection() {
               </div>
             ))}
           </div>
+          </div>
         </div>
+
+        {/* Enquiry Box Section */}
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 p-8 md:p-12">
+          <div className="text-center mb-10">
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Quick Connect</span>
+            <h2 className="text-3xl font-bold text-secondary">Send an Enquiry</h2>
+          </div>
+
+          <form className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <User size={18} className="text-gray-400" />
+                </div>
+                <input type="text" placeholder="John Doe" className="pl-11 w-full border border-gray-200 rounded-xl py-3.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium text-gray-700 transition-all" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Mobile Number</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Phone size={18} className="text-gray-400" />
+                </div>
+                <input type="tel" placeholder="+91 00000 00000" className="pl-11 w-full border border-gray-200 rounded-xl py-3.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium text-gray-700 transition-all" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Preferred Date</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <CalendarDays size={18} className="text-gray-400" />
+                </div>
+                <input type="date" className="pl-11 w-full border border-gray-200 rounded-xl py-3.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium text-gray-700 transition-all" />
+              </div>
+            </div>
+
+            <div className="md:col-span-3 mt-2">
+              <button type="button" className="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary-hover transition-colors shadow-lg shadow-primary/30">
+                Submit Enquiry
+              </button>
+            </div>
+          </form>
+        </div>
+
       </div>
     </section>
   );
