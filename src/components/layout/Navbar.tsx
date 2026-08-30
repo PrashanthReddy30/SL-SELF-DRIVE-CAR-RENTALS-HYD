@@ -59,12 +59,7 @@ export default function Navbar() {
                 >
                   Login
                 </button>
-                <button 
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="bg-primary text-white px-5 py-2 rounded-xl font-medium hover:bg-primary-hover transition-colors shadow-sm"
-                >
-                  Sign Up
-                </button>
+
               </div>
             ) : (
               <div className="relative">
@@ -152,12 +147,7 @@ export default function Navbar() {
                   >
                     Login
                   </button>
-                  <button 
-                    onClick={() => { setIsAuthModalOpen(true); setIsMenuOpen(false); }}
-                    className="w-full bg-primary text-white px-4 py-3 rounded-xl font-medium hover:bg-primary-hover transition-colors shadow-sm"
-                  >
-                    Sign Up
-                  </button>
+
                 </div>
               ) : (
                 <div className="space-y-1">
