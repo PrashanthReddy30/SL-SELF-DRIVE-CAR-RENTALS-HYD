@@ -21,10 +21,13 @@ import AdminInquiries from './pages/admin/AdminInquiries';
 import { useInquiryStore } from './store/inquiryStore';
 import { useBookingStore } from './store/bookingStore';
 
+import { useAuthStore } from './store/authStore';
+
 function App() {
   useEffect(() => {
     useInquiryStore.getState().initialize();
     useBookingStore.getState().initialize();
+    useAuthStore.getState().initialize();
   }, []);
   return (
     <Router>

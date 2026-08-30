@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Mail, Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { auth, db } from '../../lib/firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 type AuthMode = 'login' | 'signup';
 
@@ -19,33 +22,50 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
   const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy login logic: if email is admin@slrentals.com, make them admin, otherwise customer.
-    const role = email.toLowerCase() === 'admin@slrentals.com' ? 'admin' : 'customer';
-    login({
-      id: Date.now().toString(),
-      name: email.split('@')[0],
-      email: email,
-      mobile: '+91 0000000000',
-      role,
-    });
-    
-    // Toast notification would go here
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center gap-2 transform transition-all animate-bounce-in';
-    toast.innerHTML = '<span>✔</span> Login successful!';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+    setError('');
+    setLoading(true);
 
-    onClose();
+    try {
+      if (mode === 'signup') {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const role = email.toLowerCase() === 'admin@slrentals.com' ? 'admin' : 'customer';
+        
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          id: userCredential.user.uid,
+          name: fullName,
+          email: email,
+          mobile: mobile,
+          role: role
+        });
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center gap-2 transform transition-all animate-bounce-in';
+      toast.innerHTML = `<span>✔</span> ${mode === 'login' ? 'Login' : 'Account created'} successful!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
 
-    // Redirect to admin dashboard if logging in as admin
-    if (role === 'admin') {
-      navigate('/admin');
+      onClose();
+
+      const role = email.toLowerCase() === 'admin@slrentals.com' ? 'admin' : 'customer';
+      if (role === 'admin') {
+        navigate('/admin');
+      }
+    } catch (err: any) {
+      setError(err.message.replace('Firebase: ', ''));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,6 +96,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
 
         {/* Body */}
         <div className="p-6 sm:p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div>
@@ -84,7 +109,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <UserIcon size={18} className="text-gray-400" />
                   </div>
-                  <input type="text" required className="pl-10 w-full border border-gray-200 rounded-xl py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="John Doe" />
+                  <input 
+                    type="text" 
+                    required 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10 w-full border border-gray-200 rounded-xl py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
+                    placeholder="John Doe" 
+                  />
                 </div>
               </div>
             )}
@@ -92,7 +124,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
             {mode === 'signup' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                <input type="tel" required className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="+91 0000000000" />
+                <input 
+                  type="tel" 
+                  required 
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
+                  placeholder="+91 0000000000" 
+                />
               </div>
             )}
 
@@ -146,8 +185,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
               </div>
             )}
 
-            <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-md mt-6">
-              {mode === 'login' ? 'Login' : 'Create Account'}
+            <button disabled={loading} type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-md mt-6 disabled:opacity-70 disabled:cursor-not-allowed">
+              {loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Create Account')}
             </button>
           </form>
 
