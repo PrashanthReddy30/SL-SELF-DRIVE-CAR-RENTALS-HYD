@@ -80,7 +80,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 1800,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/159099/swift-exterior-right-front-three-quarter.jpeg',
+    imageUrl: '/swift.jpg',
   }
 ];
 
@@ -97,7 +97,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage-v7',
+      name: 'sl-fleet-storage-v8',
     }
   )
 );
