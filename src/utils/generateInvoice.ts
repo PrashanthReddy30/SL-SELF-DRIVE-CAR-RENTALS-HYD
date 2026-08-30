@@ -78,13 +78,29 @@ export const generateInvoice = (booking: Booking, car: Car | undefined) => {
   doc.text(`Start Date: ${startDate}`, 120, 112);
   doc.text(`End Date: ${endDate}`, 120, 119);
 
+  // Calculate Base Price vs Extra Charges
+  const hourlyRate = Math.round(car.pricePerDay / 24);
+  const extraDaysCost = (booking.extraDays || 0) * car.pricePerDay;
+  const extraHoursCost = (booking.extraHours || 0) * hourlyRate;
+  const basePrice = booking.totalPrice - extraDaysCost - extraHoursCost;
+
+  const tableBody = [
+    [`Self-Drive Rental: ${car.name}`, diffDays.toString(), `Rs. ${car.pricePerDay}`, `Rs. ${basePrice}`]
+  ];
+
+  if (booking.extraDays && booking.extraDays > 0) {
+    tableBody.push([`Extra Days`, booking.extraDays.toString(), `Rs. ${car.pricePerDay} / day`, `Rs. ${extraDaysCost}`]);
+  }
+
+  if (booking.extraHours && booking.extraHours > 0) {
+    tableBody.push([`Extra Hours`, booking.extraHours.toString(), `Rs. ${hourlyRate} / hr`, `Rs. ${extraHoursCost}`]);
+  }
+
   // Table
   autoTable(doc, {
     startY: 135,
-    head: [['Description', 'Days', 'Rate / Day', 'Total']],
-    body: [
-      [`Self-Drive Rental: ${car.name}`, diffDays.toString(), `Rs. ${car.pricePerDay}`, `Rs. ${booking.totalPrice}`],
-    ],
+    head: [['Description', 'Qty', 'Rate', 'Total']],
+    body: tableBody,
     headStyles: {
       fillColor: [239, 68, 68],
       textColor: [255, 255, 255],

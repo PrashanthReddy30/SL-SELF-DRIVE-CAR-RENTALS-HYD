@@ -1,13 +1,19 @@
 import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
 import { useState } from 'react';
-import { MessageSquare, Save } from 'lucide-react';
+import { MessageSquare, Save, X } from 'lucide-react';
+import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function AdminBookings() {
-  const { bookings, updateBookingStatus, updateAdminNote } = useBookingStore();
+  const { bookings, updateBookingStatus, updateAdminNote, completeBooking } = useBookingStore();
   const { cars } = useFleetStore();
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState('');
+  
+  // Completion Modal State
+  const [completingBooking, setCompletingBooking] = useState<string | null>(null);
+  const [extraDays, setExtraDays] = useState<number | ''>(0);
+  const [extraHours, setExtraHours] = useState<number | ''>(0);
 
   const activeBookings = bookings.filter(b => b.status !== 'Completed');
 
@@ -20,6 +26,47 @@ export default function AdminBookings() {
     updateAdminNote(id, noteContent);
     setEditingNote(null);
   };
+
+  const handleStatusChange = (bookingId: string, newStatus: string) => {
+    if (newStatus === 'Completed') {
+      setCompletingBooking(bookingId);
+      setExtraDays(0);
+      setExtraHours(0);
+    } else {
+      updateBookingStatus(bookingId, newStatus as any);
+    }
+  };
+
+  const handleCompleteSubmit = () => {
+    if (!completingBooking) return;
+    const targetBooking = bookings.find(b => b.id === completingBooking);
+    const targetCar = cars.find(c => c.id === targetBooking?.carId);
+    if (!targetBooking || !targetCar) return;
+
+    const days = Number(extraDays) || 0;
+    const hours = Number(extraHours) || 0;
+    
+    const perDayRate = targetCar.pricePerDay;
+    const hourlyRate = Math.round(perDayRate / 24);
+    const extraCost = (days * perDayRate) + (hours * hourlyRate);
+    const newTotal = targetBooking.totalPrice + extraCost;
+
+    completeBooking(completingBooking, days, hours, newTotal);
+    
+    // Create a temporary updated booking object to generate the accurate invoice instantly
+    const updatedBooking = { ...targetBooking, status: 'Completed' as any, extraDays: days, extraHours: hours, totalPrice: newTotal };
+    generateInvoice(updatedBooking, targetCar);
+    
+    setCompletingBooking(null);
+  };
+
+  // Calculations for modal preview
+  const targetBooking = bookings.find(b => b.id === completingBooking);
+  const targetCar = cars.find(c => c.id === targetBooking?.carId);
+  const perDayRate = targetCar?.pricePerDay || 0;
+  const hourlyRate = Math.round(perDayRate / 24);
+  const currentExtraCost = (Number(extraDays || 0) * perDayRate) + (Number(extraHours || 0) * hourlyRate);
+  const calculatedTotal = (targetBooking?.totalPrice || 0) + currentExtraCost;
 
   return (
     <div>
@@ -58,7 +105,7 @@ export default function AdminBookings() {
                     <td className="py-4 px-6">
                       <select 
                         value={b.status} 
-                        onChange={(e) => updateBookingStatus(b.id, e.target.value as any)}
+                        onChange={(e) => handleStatusChange(b.id, e.target.value)}
                         className={`text-sm font-bold rounded-lg px-2 py-1 outline-none border border-transparent hover:border-gray-300 focus:border-primary ${
                           b.status === 'Confirmed' ? 'text-green-700 bg-green-50' : 
                           b.status === 'Pending' ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'
@@ -97,6 +144,64 @@ export default function AdminBookings() {
           </table>
         </div>
       </div>
+      {/* Completion Modal */}
+      {completingBooking && targetBooking && targetCar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setCompletingBooking(null)}></div>
+          <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 md:p-8 animate-fade-in-up">
+            <button onClick={() => setCompletingBooking(null)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
+              <X size={24} />
+            </button>
+            <h2 className="text-2xl font-bold text-secondary mb-6">Complete Booking</h2>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Extra Days (₹{perDayRate}/day)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  value={extraDays} 
+                  onChange={(e) => setExtraDays(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Extra Hours (₹{hourlyRate}/hr pro-rata)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  max="23"
+                  value={extraHours} 
+                  onChange={(e) => setExtraHours(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 mb-8 space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Original Total:</span>
+                <span>₹{targetBooking.totalPrice.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-sm text-primary font-semibold">
+                <span>Extra Charges:</span>
+                <span>+ ₹{currentExtraCost.toLocaleString()}</span>
+              </div>
+              <div className="pt-2 border-t border-gray-200 flex justify-between font-bold text-secondary text-lg">
+                <span>New Total:</span>
+                <span>₹{calculatedTotal.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <button 
+              onClick={handleCompleteSubmit}
+              className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-md"
+            >
+              Complete & Generate Invoice
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

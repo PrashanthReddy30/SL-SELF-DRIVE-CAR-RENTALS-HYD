@@ -35,6 +35,8 @@ export interface Booking {
   endDate: string; // ISO string
   pickupLocation: string;
   totalPrice: number;
+  extraDays?: number;
+  extraHours?: number;
   status: BookingStatus;
   adminNote?: string;
   createdAt: string;
