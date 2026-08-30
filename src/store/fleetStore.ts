@@ -17,7 +17,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Diesel',
     pricePerDay: 4000,
-    imageUrl: 'https://stimg.cardekho.com/images/car-images/large/Mahindra/Thar/12264/1759493860311/STEALTH-BLACK_111111.jpg',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDaRLRwb-m6Y7CP0DKmC2FSdetL8rLOgEGqA90-RLnvNsNECHP5tMYNwEZCD7pQpE&s&ec=121966392',
   },
   {
     id: 'c2',
@@ -26,7 +26,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Diesel',
     pricePerDay: 4000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/140809/innova-crysta-exterior-right-front-three-quarter-2.jpeg',
+    imageUrl: 'https://media.vyaparify.com/vcards/products/67264/Screenshot-2024-09-27-175241.png',
   },
   {
     id: 'c3',
@@ -35,7 +35,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2800,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/115777/ertiga-exterior-right-front-three-quarter-3.jpeg',
+    imageUrl: 'https://i.pinimg.com/736x/d1/aa/08/d1aa08546f1f9bbeb34896d0293e711d.jpg',
   },
   {
     id: 'c4',
@@ -44,7 +44,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2400,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/141867/nexon-exterior-right-front-three-quarter-71.jpeg',
+    imageUrl: 'https://wallpapercave.com/wp/wp6700556.jpg',
   },
   {
     id: 'c5',
@@ -53,7 +53,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/112513/baleno-exterior-right-front-three-quarter-3.jpeg',
+    imageUrl: 'https://c.ndtvimg.com/2019-02/c0geikg8_maruti-suzuki-baleno-facelift_625x300_20_February_19.jpg',
   },
   {
     id: 'c6',
@@ -62,7 +62,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/112777/glanza-exterior-right-front-three-quarter-4.jpeg',
+    imageUrl: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Glanza/10231/1767782580969/front-left-side-47.jpg',
   },
   {
     id: 'c7',
@@ -71,7 +71,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/130591/fronx-exterior-right-front-three-quarter-109.jpeg',
+    imageUrl: 'https://www.motoring-trends.com/uploads/article/664_0_crop_100/fronx.jpg',
   },
   {
     id: 'c8',
@@ -80,7 +80,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 1800,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/159099/swift-exterior-right-front-three-quarter.jpeg',
+    imageUrl: 'https://c4.wallpaperflare.com/wallpaper/906/597/185/cars-suzuki-wallpaper-preview.jpg',
   }
 ];
 
@@ -97,7 +97,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage-v5',
+      name: 'sl-fleet-storage-v6',
     }
   )
 );
