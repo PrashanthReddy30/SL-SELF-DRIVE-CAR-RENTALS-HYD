@@ -119,7 +119,7 @@ export default function AdminCars() {
                 <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. Nissan GT-R" />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select value={category} onChange={e => setCategory(e.target.value as CarCategory)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none bg-white">
@@ -135,7 +135,6 @@ export default function AdminCars() {
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
                   </select>
-                </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Fuel Type</label>
