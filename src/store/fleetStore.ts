@@ -14,7 +14,7 @@ const initialCars: Car[] = [
     id: 'c1',
     name: 'Mahindra Thar (Black)',
     category: 'SUV',
-    transmission: 'Diesel Manual',
+    transmission: 'Manual',
     pricePerDay: 4000,
     imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800', // Black Jeep/SUV placeholder
   },
