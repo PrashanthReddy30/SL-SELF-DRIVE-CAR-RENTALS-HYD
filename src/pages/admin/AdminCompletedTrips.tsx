@@ -1,17 +1,79 @@
 import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
-import { Download, User, Phone } from 'lucide-react';
+import { Download, User, Phone, FileSpreadsheet } from 'lucide-react';
 import { generateInvoice } from '../../utils/generateInvoice';
+import { useState } from 'react';
 
 export default function AdminCompletedTrips() {
   const { bookings } = useBookingStore();
   const { cars } = useFleetStore();
+  const [selectedMonth, setSelectedMonth] = useState('');
 
   const completedTrips = bookings.filter(b => b.status === 'Completed');
 
+  const filteredTrips = selectedMonth 
+    ? completedTrips.filter(b => {
+        const [year, month] = selectedMonth.split('-');
+        const d = new Date(b.endDate);
+        return d.getFullYear() === parseInt(year) && (d.getMonth() + 1) === parseInt(month);
+      })
+    : completedTrips;
+
+  const handleDownloadReport = () => {
+    if (filteredTrips.length === 0) {
+      alert('No trips found for this month.');
+      return;
+    }
+
+    const headers = ['Booking ID', 'Customer Name', 'Phone', 'Aadhaar', 'Vehicle', 'Start Date', 'End Date', 'Location', 'Total Revenue', 'Extra Days', 'Extra Hours'];
+    const csvData = filteredTrips.map(b => {
+      const car = cars.find(c => c.id === b.carId);
+      return [
+        b.id,
+        `"${b.customerName}"`,
+        b.customerPhone,
+        b.aadharNumber || '',
+        `"${car?.name || 'Unknown'}"`,
+        new Date(b.startDate).toLocaleDateString(),
+        new Date(b.endDate).toLocaleDateString(),
+        `"${b.pickupLocation}"`,
+        b.totalPrice,
+        b.extraDays || 0,
+        b.extraHours || 0
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...csvData].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `SL_Trips_Report_${selectedMonth || 'All'}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
-      <h1 className="text-2xl sm:text-3xl font-bold text-secondary mb-8">Completed Trips Log</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-secondary">Completed Trips Log</h1>
+        
+        <div className="flex items-center gap-3">
+          <input 
+            type="month" 
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+          <button 
+            onClick={handleDownloadReport}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
+          >
+            <FileSpreadsheet size={18} />
+            Export CSV
+          </button>
+        </div>
+      </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
@@ -27,12 +89,12 @@ export default function AdminCompletedTrips() {
               </tr>
             </thead>
             <tbody>
-              {completedTrips.length === 0 ? (
+              {filteredTrips.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-gray-500">No completed trips found.</td>
                 </tr>
               ) : (
-                completedTrips.map(b => {
+                filteredTrips.map(b => {
                   const car = cars.find(c => c.id === b.carId);
                   return (
                     <tr key={b.id} className="border-b border-gray-100 hover:bg-gray-50">
