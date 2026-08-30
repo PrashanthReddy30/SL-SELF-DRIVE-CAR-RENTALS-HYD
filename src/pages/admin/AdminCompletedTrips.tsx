@@ -7,17 +7,22 @@ import { useState } from 'react';
 export default function AdminCompletedTrips() {
   const { bookings } = useBookingStore();
   const { cars } = useFleetStore();
-  const [selectedMonth, setSelectedMonth] = useState('');
+  const [filterStartDate, setFilterStartDate] = useState('');
+  const [filterEndDate, setFilterEndDate] = useState('');
 
   const completedTrips = bookings.filter(b => b.status === 'Completed');
 
-  const filteredTrips = selectedMonth 
-    ? completedTrips.filter(b => {
-        const [year, month] = selectedMonth.split('-');
-        const d = new Date(b.endDate);
-        return d.getFullYear() === parseInt(year) && (d.getMonth() + 1) === parseInt(month);
-      })
-    : completedTrips;
+  const filteredTrips = completedTrips.filter(b => {
+    if (!filterStartDate && !filterEndDate) return true;
+    
+    const tripDate = new Date(b.endDate).getTime();
+    const start = filterStartDate ? new Date(filterStartDate).getTime() : 0;
+    
+    // If end date is selected, set it to the end of that day (23:59:59) to include all trips on that day
+    const end = filterEndDate ? new Date(filterEndDate).getTime() + (24 * 60 * 60 * 1000) - 1 : Infinity;
+
+    return tripDate >= start && tripDate <= end;
+  });
 
   const handleDownloadReport = () => {
     if (filteredTrips.length === 0) {
@@ -48,7 +53,9 @@ export default function AdminCompletedTrips() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `SL_Trips_Report_${selectedMonth || 'All'}.csv`;
+    
+    const dateStr = (filterStartDate && filterEndDate) ? `${filterStartDate}_to_${filterEndDate}` : 'All';
+    link.download = `SL_Trips_Report_${dateStr}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -58,16 +65,28 @@ export default function AdminCompletedTrips() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-secondary">Completed Trips Log</h1>
         
-        <div className="flex items-center gap-3">
-          <input 
-            type="month" 
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary"
-          />
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-500">From</span>
+            <input 
+              type="date" 
+              value={filterStartDate}
+              onChange={(e) => setFilterStartDate(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-500">To</span>
+            <input 
+              type="date" 
+              value={filterEndDate}
+              onChange={(e) => setFilterEndDate(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </div>
           <button 
             onClick={handleDownloadReport}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm w-full sm:w-auto"
           >
             <FileSpreadsheet size={18} />
             Export CSV
