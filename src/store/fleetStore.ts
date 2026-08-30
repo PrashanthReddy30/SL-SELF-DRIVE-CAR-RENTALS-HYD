@@ -12,11 +12,11 @@ interface FleetState {
 const initialCars: Car[] = [
   {
     id: 'c1',
-    name: 'Nissan Ariya',
+    name: 'Mahindra Thar (Black)',
     category: 'SUV',
-    transmission: 'Automatic',
-    pricePerDay: 4500,
-    imageUrl: 'https://images.unsplash.com/photo-1632245889029-e406faaa34cd?auto=format&fit=crop&q=80&w=800',
+    transmission: 'Diesel Manual',
+    pricePerDay: 4000,
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800', // Black Jeep/SUV placeholder
   },
   {
     id: 'c2',
@@ -73,7 +73,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage',
+      name: 'sl-fleet-storage-v2',
     }
   )
 );
