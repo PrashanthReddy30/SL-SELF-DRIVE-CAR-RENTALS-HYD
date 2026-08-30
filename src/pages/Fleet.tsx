@@ -25,7 +25,7 @@ export default function Fleet() {
     setSelectedCar(car);
   };
 
-  const categories = ['All', 'Sedan', 'SUV', 'Luxury', 'Sports'];
+  const categories = ['All', 'Sedan', 'SUV', 'MUV', 'Hatchback', 'Luxury', 'Sports'];
 
   const filteredCars = cars.filter(car => {
     const matchesSearch = car.name.toLowerCase().includes(search.toLowerCase());

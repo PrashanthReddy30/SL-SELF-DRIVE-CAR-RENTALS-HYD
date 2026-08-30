@@ -8,7 +8,7 @@ export interface User {
   role: Role;
 }
 
-export type CarCategory = 'Sedan' | 'SUV' | 'Luxury' | 'Sports';
+export type CarCategory = 'Sedan' | 'SUV' | 'MUV' | 'Hatchback' | 'Luxury' | 'Sports';
 export type Transmission = 'Automatic' | 'Manual';
 export type FuelType = 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
 
