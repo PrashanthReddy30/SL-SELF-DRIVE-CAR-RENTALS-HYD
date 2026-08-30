@@ -2,10 +2,13 @@ import { useFleetStore } from '../../store/fleetStore';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BookingModal from '../booking/BookingModal';
+import type { Car } from '../../types';
 
 export default function FleetSection() {
   const { cars } = useFleetStore();
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const navigate = useNavigate();
 
   const toggleWishlist = (id: string) => {
@@ -61,7 +64,10 @@ export default function FleetSection() {
                     <span className="text-2xl font-bold text-secondary">₹{car.pricePerDay.toLocaleString()}</span>
                     <span className="text-gray-500 text-sm">/day</span>
                   </div>
-                  <button className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm">
+                  <button 
+                    onClick={() => setSelectedCar(car)}
+                    className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm"
+                  >
                     Rent Now
                   </button>
                 </div>
@@ -70,6 +76,12 @@ export default function FleetSection() {
           ))}
         </div>
       </div>
+
+      <BookingModal 
+        isOpen={!!selectedCar}
+        onClose={() => setSelectedCar(null)}
+        car={selectedCar}
+      />
     </section>
   );
 }
