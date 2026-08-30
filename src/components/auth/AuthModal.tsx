@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Mail, Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
 import { auth, db } from '../../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
