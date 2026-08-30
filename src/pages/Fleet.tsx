@@ -89,11 +89,11 @@ export default function Fleet() {
                 </button>
               </div>
 
-              <div className="h-48 mb-6 flex items-center justify-center overflow-hidden">
+              <div className="h-48 mb-6 flex items-center justify-center overflow-hidden bg-slate-100 rounded-xl">
                 <img 
                   src={car.imageUrl} 
                   alt={car.name} 
-                  className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
