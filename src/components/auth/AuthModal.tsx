@@ -16,7 +16,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', interceptMessage }: AuthModalProps) {
   const navigate = useNavigate();
-  const [mode] = useState<AuthMode>(initialMode);
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   // const { login } = useAuthStore();
   const [email, setEmail] = useState('');
@@ -188,7 +188,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
               {loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Create Account')}
             </button>
           </form>
-
+          <div className="mt-8 text-center text-sm text-gray-600">
+            {mode === 'login' ? (
+              <p>Don't have an account? <button type="button" onClick={() => setMode('signup')} className="text-primary font-bold hover:underline">Sign Up</button></p>
+            ) : (
+              <p>Already have an account? <button type="button" onClick={() => setMode('login')} className="text-primary font-bold hover:underline">Login</button></p>
+            )}
+          </div>
 
 
 
