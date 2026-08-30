@@ -179,7 +179,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
               <div className="flex items-start gap-2 mt-2">
                 <input type="checkbox" id="terms" required className="mt-1 text-primary focus:ring-primary border-gray-300 rounded" />
                 <label htmlFor="terms" className="text-xs text-gray-500 leading-tight">
-                  I agree to the Terms & Conditions and Privacy Policy.
+                  I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">Terms & Conditions</a> and Privacy Policy.
                 </label>
               </div>
             )}

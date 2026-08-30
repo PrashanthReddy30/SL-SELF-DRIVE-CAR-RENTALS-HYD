@@ -12,6 +12,8 @@ import Contact from './pages/Contact';
 const Team = () => <div className="p-8"><h1 className="text-3xl font-bold">Team</h1></div>;
 const FAQ = () => <div className="p-8"><h1 className="text-3xl font-bold">FAQ</h1></div>;
 
+import Terms from './pages/Terms';
+
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCars from './pages/admin/AdminCars';
@@ -41,6 +43,7 @@ function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/terms" element={<Terms />} />
         </Route>
 
         {/* Admin Routes */}
