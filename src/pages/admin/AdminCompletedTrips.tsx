@@ -1,6 +1,7 @@
 import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
 import { Download, User, Phone } from 'lucide-react';
+import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function AdminCompletedTrips() {
   const { bookings } = useBookingStore();
@@ -58,7 +59,10 @@ export default function AdminCompletedTrips() {
                       <td className="py-4 px-6 text-sm text-gray-600">{b.pickupLocation}</td>
                       <td className="py-4 px-6 font-bold text-green-600">₹{b.totalPrice.toLocaleString()}</td>
                       <td className="py-4 px-6 text-right">
-                        <button className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
+                        <button 
+                          onClick={() => generateInvoice(b, car)}
+                          className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                        >
                           <Download size={14} /> PDF
                         </button>
                       </td>

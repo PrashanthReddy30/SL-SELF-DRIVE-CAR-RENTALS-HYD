@@ -1,9 +1,10 @@
 import { useAuthStore } from '../store/authStore';
 import { useBookingStore } from '../store/bookingStore';
 import { useFleetStore } from '../store/fleetStore';
-import { ArrowLeft, UserCircle, LogOut, Phone, Mail, MapPin } from 'lucide-react';
+import { ArrowLeft, UserCircle, LogOut, Phone, Mail, MapPin, Download } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { useState } from 'react';
+import { generateInvoice } from '../utils/generateInvoice';
 
 export default function Profile() {
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -124,6 +125,15 @@ export default function Profile() {
                                 {booking.status}
                               </span>
                               <p className="text-xl font-bold text-secondary mt-2">₹{booking.totalPrice.toLocaleString()}</p>
+                              
+                              {booking.status === 'Completed' && (
+                                <button 
+                                  onClick={() => generateInvoice(booking, car)}
+                                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                                >
+                                  <Download size={14} /> Invoice
+                                </button>
+                              )}
                             </div>
                           </div>
 
