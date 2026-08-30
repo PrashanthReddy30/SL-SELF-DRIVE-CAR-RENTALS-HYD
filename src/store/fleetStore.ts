@@ -26,7 +26,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Diesel',
     pricePerDay: 4000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/140809/innova-crysta-exterior-right-front-three-quarter-2.jpeg',
+    imageUrl: '/innova%20crysta.png',
   },
   {
     id: 'c3',
@@ -35,7 +35,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2800,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/115777/ertiga-exterior-right-front-three-quarter-3.jpeg',
+    imageUrl: '/ertiga.jpg',
   },
   {
     id: 'c4',
@@ -53,7 +53,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/112513/baleno-exterior-right-front-three-quarter-3.jpeg',
+    imageUrl: '/maruti-suzuki-baleno.webp',
   },
   {
     id: 'c6',
@@ -62,7 +62,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
-    imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/112777/glanza-exterior-right-front-three-quarter-4.jpeg',
+    imageUrl: '/Toyota%20Glanza.avif',
   },
   {
     id: 'c7',
@@ -97,7 +97,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage-v8',
+      name: 'sl-fleet-storage-v9',
     }
   )
 );
