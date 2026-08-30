@@ -57,7 +57,11 @@ export default function FleetSection() {
 
               <div className="mt-auto">
                 <h3 className="text-xl font-bold text-secondary mb-1">{car.name}</h3>
-                <p className="text-sm text-gray-500 font-medium mb-6">{car.transmission}</p>
+                <div className="flex gap-3 text-sm text-gray-500 font-medium mb-6">
+                  <span>{car.transmission}</span>
+                  <span>•</span>
+                  <span>{car.fuelType}</span>
+                </div>
                 
                 <div className="flex items-center justify-between border-t border-gray-100 pt-6">
                   <div>

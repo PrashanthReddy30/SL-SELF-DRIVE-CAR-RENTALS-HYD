@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useFleetStore } from '../../store/fleetStore';
 import { Edit, Trash2, Plus, X } from 'lucide-react';
-import type { Car, CarCategory, Transmission } from '../../types';
+import type { Car, CarCategory, Transmission, FuelType } from '../../types';
 
 export default function AdminCars() {
   const { cars, addCar, updateCar, deleteCar } = useFleetStore();
@@ -12,6 +12,7 @@ export default function AdminCars() {
   const [name, setName] = useState('');
   const [category, setCategory] = useState<CarCategory>('Sedan');
   const [transmission, setTransmission] = useState<Transmission>('Automatic');
+  const [fuelType, setFuelType] = useState<FuelType>('Petrol');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
 
@@ -20,6 +21,7 @@ export default function AdminCars() {
     setName('');
     setCategory('Sedan');
     setTransmission('Automatic');
+    setFuelType('Petrol');
     setPrice('');
     setImageUrl('');
     setIsModalOpen(true);
@@ -30,6 +32,7 @@ export default function AdminCars() {
     setName(car.name);
     setCategory(car.category);
     setTransmission(car.transmission);
+    setFuelType(car.fuelType || 'Petrol');
     setPrice(car.pricePerDay.toString());
     setImageUrl(car.imageUrl);
     setIsModalOpen(true);
@@ -39,12 +42,12 @@ export default function AdminCars() {
     e.preventDefault();
     if (editingCar) {
       updateCar(editingCar.id, {
-        name, category, transmission, pricePerDay: Number(price), imageUrl
+        name, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
       });
     } else {
       addCar({
         id: Date.now().toString(),
-        name, category, transmission, pricePerDay: Number(price), imageUrl
+        name, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
       });
     }
     setIsModalOpen(false);
@@ -71,6 +74,7 @@ export default function AdminCars() {
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">NAME</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">CATEGORY</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TRANSMISSION</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">FUEL</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">PRICE/DAY</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm text-right">ACTIONS</th>
               </tr>
@@ -86,6 +90,7 @@ export default function AdminCars() {
                     <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-semibold">{car.category}</span>
                   </td>
                   <td className="py-3 px-6 text-sm text-gray-600">{car.transmission}</td>
+                  <td className="py-3 px-6 text-sm text-gray-600">{car.fuelType}</td>
                   <td className="py-3 px-6 font-semibold text-secondary">₹{car.pricePerDay}</td>
                   <td className="py-3 px-6 text-right">
                     <button onClick={() => openEditModal(car)} className="text-blue-500 hover:text-blue-700 p-2"><Edit size={18} /></button>
@@ -129,6 +134,16 @@ export default function AdminCars() {
                   <select value={transmission} onChange={e => setTransmission(e.target.value as Transmission)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none bg-white">
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
+                  </select>
+                </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Fuel Type</label>
+                  <select value={fuelType} onChange={e => setFuelType(e.target.value as FuelType)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none bg-white">
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
                   </select>
                 </div>
               </div>

@@ -10,12 +10,14 @@ export interface User {
 
 export type CarCategory = 'Sedan' | 'SUV' | 'Luxury' | 'Sports';
 export type Transmission = 'Automatic' | 'Manual';
+export type FuelType = 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
 
 export interface Car {
   id: string;
   name: string;
   category: CarCategory;
   transmission: Transmission;
+  fuelType: FuelType;
   pricePerDay: number;
   imageUrl: string;
 }

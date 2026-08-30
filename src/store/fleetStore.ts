@@ -15,6 +15,7 @@ const initialCars: Car[] = [
     name: 'Mahindra Thar (Black)',
     category: 'SUV',
     transmission: 'Manual',
+    fuelType: 'Diesel',
     pricePerDay: 4000,
     imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800', // Black Jeep/SUV placeholder
   },
@@ -23,6 +24,7 @@ const initialCars: Car[] = [
     name: 'Rolls-Royce Ghost',
     category: 'Luxury',
     transmission: 'Automatic',
+    fuelType: 'Petrol',
     pricePerDay: 25000,
     imageUrl: 'https://images.unsplash.com/photo-1631269666723-5e9a4fce1a2f?auto=format&fit=crop&q=80&w=800',
   },
@@ -31,6 +33,7 @@ const initialCars: Car[] = [
     name: 'Porsche Macan 4',
     category: 'SUV',
     transmission: 'Automatic',
+    fuelType: 'Electric',
     pricePerDay: 12000,
     imageUrl: 'https://images.unsplash.com/photo-1503376760367-1329a2444635?auto=format&fit=crop&q=80&w=800', // temporary substitute
   },
@@ -39,6 +42,7 @@ const initialCars: Car[] = [
     name: 'Cayenne S E-Hybrid',
     category: 'SUV',
     transmission: 'Automatic',
+    fuelType: 'Hybrid',
     pricePerDay: 15000,
     imageUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=800',
   },
@@ -47,6 +51,7 @@ const initialCars: Car[] = [
     name: 'Nissan GT-R',
     category: 'Sports',
     transmission: 'Automatic',
+    fuelType: 'Petrol',
     pricePerDay: 18000,
     imageUrl: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=800',
   },
@@ -55,6 +60,7 @@ const initialCars: Car[] = [
     name: 'Panamera Turbo',
     category: 'Sedan',
     transmission: 'Automatic',
+    fuelType: 'Petrol',
     pricePerDay: 14000,
     imageUrl: 'https://images.unsplash.com/photo-1503376760367-1329a2444635?auto=format&fit=crop&q=80&w=800',
   }
@@ -73,7 +79,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage-v2',
+      name: 'sl-fleet-storage-v3',
     }
   )
 );
