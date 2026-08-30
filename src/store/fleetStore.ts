@@ -17,7 +17,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Diesel',
     pricePerDay: 4000,
-    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800', // Black Jeep/SUV placeholder
+    imageUrl: 'https://stimg.cardekho.com/images/car-images/large/Mahindra/Thar/12264/1759493860311/STEALTH-BLACK_111111.jpg',
   },
   {
     id: 'c2',
@@ -79,7 +79,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage-v3',
+      name: 'sl-fleet-storage-v4',
     }
   )
 );
