@@ -9,7 +9,19 @@ export default function Hero() {
           className="w-full h-full object-cover"
         />
         {/* Subtle overlay to make it look premium */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none"></div>
+      </div>
+      
+      {/* Quotation / Tagline */}
+      <div className="absolute inset-y-0 left-0 flex items-center z-20 px-4 sm:px-8 md:px-16 max-w-3xl">
+        <div className="text-white">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 drop-shadow-lg">
+            The journey matters more than the destination.
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-200 font-medium drop-shadow-md">
+            Drive your own story with RideWave SL Self Drive
+          </p>
+        </div>
       </div>
       
       {/* Floating Badge (optional, but keeps some of the original flair) */}
