@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import { X, Calendar, User, Phone, CreditCard } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, Calendar, User, Phone, CreditCard, Camera, Image as ImageIcon } from 'lucide-react';
 import { useBookingStore } from '../../store/bookingStore';
 import { useAuthStore } from '../../store/authStore';
+import { storage } from '../../lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Tesseract from 'tesseract.js';
 import type { Car } from '../../types';
 
 interface BookingModalProps {
@@ -17,11 +20,41 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
   const [formData, setFormData] = useState({
     name: user?.name || '',
     phone: user?.mobile || '',
-    aadhar: '',
+    aadhar: user?.aadhaar || '',
     startDate: '',
     endDate: '',
     pickupLocation: 'Nagaram Main Road',
   });
+
+  const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
+  const [aadhaarPreview, setAadhaarPreview] = useState<string | null>(null);
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [showFullImage, setShowFullImage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCaptureAadhaar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAadhaarFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setAadhaarPreview(objectUrl);
+
+    setIsOcrProcessing(true);
+    try {
+      const result = await Tesseract.recognize(file, 'eng');
+      const text = result.data.text;
+      const aadhaarMatch = text.match(/(?:\d{4}\s?){3}/);
+      if (aadhaarMatch) {
+        setFormData({ ...formData, aadhar: aadhaarMatch[0].replace(/\s/g, '') });
+      }
+    } catch (err) {
+      console.error('OCR Error:', err);
+    } finally {
+      setIsOcrProcessing(false);
+    }
+  };
 
   if (!isOpen || !car) return null;
 
@@ -34,8 +67,9 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
     return diffDays > 0 ? diffDays : 1;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     if (!user?.id) {
       alert('Authentication required: Please login first to book a car.');
@@ -45,7 +79,18 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
     const days = calculateDays();
     const totalPrice = days * car.pricePerDay;
 
-    addBooking({
+    let aadhaarUrl = '';
+    if (aadhaarFile) {
+      try {
+        const storageRef = ref(storage, `booking_proofs/${user.id}_${Date.now()}.jpg`);
+        await uploadBytes(storageRef, aadhaarFile);
+        aadhaarUrl = await getDownloadURL(storageRef);
+      } catch (err) {
+        console.error("Error uploading ID proof:", err);
+      }
+    }
+
+    await addBooking({
       id: Date.now().toString(),
       carId: car.id,
       userId: user?.id,
@@ -57,6 +102,7 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
       pickupLocation: formData.pickupLocation,
       totalPrice,
       status: 'Pending',
+      aadhaarUrl: aadhaarUrl,
       createdAt: new Date().toISOString()
     });
 
@@ -66,6 +112,7 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
 
+    setIsSubmitting(false);
     onClose();
   };
 
@@ -125,16 +172,51 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
                 <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                   <CreditCard size={16} className="text-gray-400" /> Aadhar Number (ID Proof)
                 </label>
-                <input 
-                  type="text" 
-                  required
-                  pattern="[0-9]{12}"
-                  title="12 digit Aadhar number"
-                  value={formData.aadhar}
-                  onChange={e => setFormData({...formData, aadhar: e.target.value})}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium tracking-widest transition-all" 
-                  placeholder="0000 0000 0000" 
-                />
+                <div className="flex gap-2 items-center">
+                  <div className="relative flex-1">
+                    <input 
+                      type="text" 
+                      required
+                      pattern="[0-9]{12}"
+                      title="12 digit Aadhar number"
+                      value={formData.aadhar}
+                      onChange={e => setFormData({...formData, aadhar: e.target.value})}
+                      className={`w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium tracking-widest transition-all ${isOcrProcessing ? 'bg-gray-100 text-gray-400' : ''}`} 
+                      placeholder={isOcrProcessing ? 'Scanning...' : '0000 0000 0000'}
+                      disabled={isOcrProcessing}
+                    />
+                  </div>
+                  
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    capture="environment" 
+                    className="hidden" 
+                    ref={fileInputRef} 
+                    onChange={handleCaptureAadhaar}
+                  />
+
+                  {aadhaarPreview ? (
+                    <div 
+                      className="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden cursor-pointer shrink-0 hover:border-primary transition-colors relative group"
+                      onClick={() => setShowFullImage(true)}
+                    >
+                      <img src={aadhaarPreview} alt="Aadhaar Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ImageIcon size={16} className="text-white" />
+                      </div>
+                    </div>
+                  ) : (
+                    <button 
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-12 h-12 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl flex items-center justify-center transition-colors shrink-0"
+                      title="Capture ID Proof"
+                    >
+                      <Camera size={20} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Dates */}
@@ -172,13 +254,28 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
                 <p className="text-sm text-gray-500 font-medium">Estimated Total ({calculateDays()} days)</p>
                 <p className="text-2xl font-bold text-secondary">₹{(calculateDays() * car.pricePerDay).toLocaleString()}</p>
               </div>
-              <button type="submit" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm">
-                Confirm Booking
+              <button disabled={isSubmitting} type="submit" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+                {isSubmitting ? 'Processing...' : 'Confirm Booking'}
               </button>
             </div>
           </form>
         </div>
       </div>
+
+      {/* Full Image Preview Modal */}
+      {showFullImage && aadhaarPreview && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" onClick={() => setShowFullImage(false)}>
+          <div className="relative max-w-3xl w-full h-full flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setShowFullImage(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 bg-white/20 p-2 rounded-full transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <img src={aadhaarPreview} alt="Aadhaar Full Preview" className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

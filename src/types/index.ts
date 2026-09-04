@@ -5,6 +5,8 @@ export interface User {
   name: string;
   email: string;
   mobile: string;
+  aadhaar?: string;
+  aadhaarUrl?: string;
   role: Role;
 }
 
@@ -37,6 +39,7 @@ export interface Booking {
   totalPrice: number;
   extraDays?: number;
   extraHours?: number;
+  aadhaarUrl?: string;
   status: BookingStatus;
   adminNote?: string;
   createdAt: string;

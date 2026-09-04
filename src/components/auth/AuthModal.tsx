@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Mail, Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
-import { auth, db } from '../../lib/firebase';
+import { X, Mail, Lock, User as UserIcon, Eye, EyeOff, Camera, Image as ImageIcon } from 'lucide-react';
+import { auth, db, storage } from '../../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Tesseract from 'tesseract.js';
+import React, { useRef } from 'react';
 
 type AuthMode = 'login' | 'signup';
 
@@ -24,8 +27,37 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
   const [fullName, setFullName] = useState('');
   const [mobile, setMobile] = useState('');
   const [aadhaar, setAadhaar] = useState('');
+  const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
+  const [aadhaarPreview, setAadhaarPreview] = useState<string | null>(null);
+  const [isOcrProcessing, setIsOcrProcessing] = useState(false);
+  const [showFullImage, setShowFullImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleCaptureAadhaar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAadhaarFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setAadhaarPreview(objectUrl);
+
+    setIsOcrProcessing(true);
+    try {
+      const result = await Tesseract.recognize(file, 'eng');
+      const text = result.data.text;
+      const aadhaarMatch = text.match(/(?:\d{4}\s?){3}/);
+      if (aadhaarMatch) {
+        setAadhaar(aadhaarMatch[0].replace(/\s/g, ''));
+      }
+    } catch (err) {
+      console.error('OCR Error:', err);
+    } finally {
+      setIsOcrProcessing(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -57,12 +89,20 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const role = email.toLowerCase() === 'admin@slrentals.com' ? 'admin' : 'customer';
         
+        let aadhaarUrl = '';
+        if (aadhaarFile) {
+          const storageRef = ref(storage, `aadhaar_proofs/${userCredential.user.uid}_${Date.now()}.jpg`);
+          await uploadBytes(storageRef, aadhaarFile);
+          aadhaarUrl = await getDownloadURL(storageRef);
+        }
+
         await setDoc(doc(db, 'users', userCredential.user.uid), {
           id: userCredential.user.uid,
           name: fullName,
           email: email,
           mobile: mobile,
           aadhaar: aadhaar.replace(/\s/g, ''),
+          aadhaarUrl: aadhaarUrl,
           role: role
         });
       } else {
@@ -158,15 +198,50 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
             {mode === 'signup' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Aadhaar Number</label>
-                <input 
-                  type="text" 
-                  required 
-                  value={aadhaar}
-                  onChange={(e) => setAadhaar(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
-                  placeholder="1234 5678 9012" 
-                  maxLength={14}
-                />
+                <div className="flex gap-2 items-center">
+                  <div className="relative flex-1">
+                    <input 
+                      type="text" 
+                      required 
+                      value={aadhaar}
+                      onChange={(e) => setAadhaar(e.target.value)}
+                      className={`w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${isOcrProcessing ? 'bg-gray-100 text-gray-400' : ''}`} 
+                      placeholder={isOcrProcessing ? 'Scanning...' : '1234 5678 9012'} 
+                      maxLength={14}
+                      disabled={isOcrProcessing}
+                    />
+                  </div>
+                  
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    capture="environment" 
+                    className="hidden" 
+                    ref={fileInputRef} 
+                    onChange={handleCaptureAadhaar}
+                  />
+
+                  {aadhaarPreview ? (
+                    <div 
+                      className="w-11 h-11 rounded-xl border border-gray-200 overflow-hidden cursor-pointer shrink-0 hover:border-primary transition-colors relative group"
+                      onClick={() => setShowFullImage(true)}
+                    >
+                      <img src={aadhaarPreview} alt="Aadhaar Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ImageIcon size={16} className="text-white" />
+                      </div>
+                    </div>
+                  ) : (
+                    <button 
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-11 h-11 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl flex items-center justify-center transition-colors shrink-0"
+                      title="Capture Aadhaar"
+                    >
+                      <Camera size={20} />
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -236,6 +311,21 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', inte
 
         </div>
       </div>
+
+      {/* Full Image Preview Modal */}
+      {showFullImage && aadhaarPreview && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" onClick={() => setShowFullImage(false)}>
+          <div className="relative max-w-3xl w-full h-full flex items-center justify-center p-4" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setShowFullImage(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 bg-white/20 p-2 rounded-full transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <img src={aadhaarPreview} alt="Aadhaar Full Preview" className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
