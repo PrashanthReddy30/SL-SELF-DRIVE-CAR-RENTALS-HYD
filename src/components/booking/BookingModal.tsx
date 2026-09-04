@@ -45,12 +45,26 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
     try {
       const result = await Tesseract.recognize(file, 'eng');
       const text = result.data.text;
-      const aadhaarMatch = text.match(/(?:\d{4}\s?){3}/);
-      if (aadhaarMatch) {
-        setFormData({ ...formData, aadhar: aadhaarMatch[0].replace(/\s/g, '') });
+      
+      // Try to find 12 consecutive digits after stripping all non-digits
+      const digitsOnly = text.replace(/\D/g, '');
+      const match = digitsOnly.match(/\d{12}/);
+      
+      if (match) {
+        setFormData({ ...formData, aadhar: match[0] });
+      } else {
+        // Fallback: check original text with relaxed spaces/dashes
+        const relaxedMatch = text.match(/\d{4}[\s-]*\d{4}[\s-]*\d{4}/);
+        if (relaxedMatch) {
+          setFormData({ ...formData, aadhar: relaxedMatch[0].replace(/\D/g, '') });
+        } else {
+          console.warn('OCR could not detect a 12-digit number.', text);
+          alert('Could not automatically read Aadhaar number. Please type it in manually.');
+        }
       }
     } catch (err) {
       console.error('OCR Error:', err);
+      alert('OCR processing failed. Please enter the number manually.');
     } finally {
       setIsOcrProcessing(false);
     }
