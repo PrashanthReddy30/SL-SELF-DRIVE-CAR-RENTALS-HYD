@@ -73,6 +73,8 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
     
     if (!user?.id) {
       alert('Authentication required: Please login first to book a car.');
+      setIsSubmitting(false);
+      onClose();
       return;
     }
 
@@ -90,30 +92,36 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
       }
     }
 
-    await addBooking({
-      id: Date.now().toString(),
-      carId: car.id,
-      userId: user?.id,
-      customerName: formData.name,
-      customerPhone: formData.phone,
-      aadharNumber: formData.aadhar,
-      startDate: new Date(formData.startDate).toISOString(),
-      endDate: new Date(formData.endDate).toISOString(),
-      pickupLocation: formData.pickupLocation,
-      totalPrice,
-      status: 'Pending',
-      aadhaarUrl: aadhaarUrl,
-      createdAt: new Date().toISOString()
-    });
+    try {
+      await addBooking({
+        id: Date.now().toString(),
+        carId: car.id,
+        userId: user?.id,
+        customerName: formData.name,
+        customerPhone: formData.phone,
+        aadharNumber: formData.aadhar,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        pickupLocation: formData.pickupLocation,
+        totalPrice,
+        status: 'Pending',
+        aadhaarUrl: aadhaarUrl,
+        createdAt: new Date().toISOString()
+      });
 
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center gap-2 transform transition-all animate-bounce-in';
-    toast.innerHTML = '<span>✔</span> Booking request submitted successfully!';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] flex items-center gap-2 transform transition-all animate-bounce-in';
+      toast.innerHTML = '<span>✔</span> Booking request submitted successfully!';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
 
-    setIsSubmitting(false);
-    onClose();
+      onClose();
+    } catch (err) {
+      console.error("Booking failed:", err);
+      alert('Failed to submit booking. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
