@@ -1,4 +1,5 @@
 import { useFleetStore } from '../store/fleetStore';
+import { useAuthStore } from '../store/authStore';
 import { Heart, Search, Filter } from 'lucide-react';
 import { useState } from 'react';
 import AuthModal from '../components/auth/AuthModal';
@@ -8,11 +9,12 @@ import type { Car } from '../types';
 
 export default function Fleet() {
   const { cars } = useFleetStore();
+  const { isAuthenticated } = useAuthStore();
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [enquiryCar, setEnquiryCar] = useState<Car | null>(null);
-  const interceptMessage = '';
+  const [interceptMessage, setInterceptMessage] = useState('');
   
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
@@ -22,6 +24,11 @@ export default function Fleet() {
   };
 
   const handleRentNow = (car: Car) => {
+    if (!isAuthenticated) {
+      setInterceptMessage('Please login first then book your car');
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSelectedCar(car);
   };
 

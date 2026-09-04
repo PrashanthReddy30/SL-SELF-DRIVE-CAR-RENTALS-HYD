@@ -37,6 +37,11 @@ export default function BookingModal({ isOpen, onClose, car }: BookingModalProps
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user?.id) {
+      alert('Authentication required: Please login first to book a car.');
+      return;
+    }
+
     const days = calculateDays();
     const totalPrice = days * car.pricePerDay;
 

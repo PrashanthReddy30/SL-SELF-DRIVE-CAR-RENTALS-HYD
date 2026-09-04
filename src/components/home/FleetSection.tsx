@@ -1,18 +1,32 @@
 import { useFleetStore } from '../../store/fleetStore';
+import { useAuthStore } from '../../store/authStore';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BookingModal from '../booking/BookingModal';
+import AuthModal from '../auth/AuthModal';
 import type { Car } from '../../types';
 
 export default function FleetSection() {
   const { cars } = useFleetStore();
+  const { isAuthenticated } = useAuthStore();
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [interceptMessage, setInterceptMessage] = useState('');
   const navigate = useNavigate();
 
   const toggleWishlist = (id: string) => {
     setWishlist(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleRentNow = (car: Car) => {
+    if (!isAuthenticated) {
+      setInterceptMessage('Please login first then book your car');
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setSelectedCar(car);
   };
 
   return (
@@ -69,7 +83,7 @@ export default function FleetSection() {
                     <span className="text-gray-500 text-sm">/day</span>
                   </div>
                   <button 
-                    onClick={() => setSelectedCar(car)}
+                    onClick={() => handleRentNow(car)}
                     className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-sm"
                   >
                     Rent Now
@@ -81,6 +95,11 @@ export default function FleetSection() {
         </div>
       </div>
 
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        interceptMessage={interceptMessage}
+      />
       <BookingModal 
         isOpen={!!selectedCar}
         onClose={() => setSelectedCar(null)}
