@@ -33,12 +33,15 @@ export default function AdminCompletedTrips() {
     const headers = ['Booking ID', 'Customer Name', 'Phone', 'Aadhaar', 'Vehicle', 'Start Date', 'End Date', 'Location', 'Total Revenue', 'Extra Days', 'Extra Hours'];
     const csvData = filteredTrips.map(b => {
       const car = cars.find(c => c.id === b.carId);
+      const carName = b.carName || car?.name || 'Unknown';
+      const carNumber = b.carNumber || car?.carNumber;
+      const carDisplayName = carNumber ? `${carName} - ${carNumber}` : carName;
       return [
         b.id,
         `"${b.customerName}"`,
         b.customerPhone,
         b.aadharNumber || '',
-        `"${b.carName || car?.name || 'Unknown'}${b.carNumber || car?.carNumber ? ` - ${b.carNumber || car?.carNumber}` : ''}"`,
+        `"${carDisplayName}"`,
         new Date(b.startDate).toLocaleDateString(),
         new Date(b.endDate).toLocaleDateString(),
         `"${b.pickupLocation}"`,
@@ -115,6 +118,9 @@ export default function AdminCompletedTrips() {
               ) : (
                 filteredTrips.map(b => {
                   const car = cars.find(c => c.id === b.carId);
+                  const carName = b.carName || car?.name || 'Unknown';
+                  const carNumber = b.carNumber || car?.carNumber;
+                  const carDisplayName = carNumber ? `${carName} - ${carNumber}` : carName;
                   return (
                     <tr key={b.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-4 px-6">
@@ -131,10 +137,7 @@ export default function AdminCompletedTrips() {
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           {car && <img src={car.imageUrl} alt={car.name} className="w-12 h-8 rounded object-cover" />}
-                          <span className="font-semibold text-sm text-secondary">
-                            {b.carName || car?.name || 'Unknown'}
-                            {(b.carNumber || car?.carNumber) ? ` - ${b.carNumber || car?.carNumber}` : ''}
-                          </span>
+                          <span className="font-semibold text-sm text-secondary">{carDisplayName}</span>
                         </div>
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-600">
