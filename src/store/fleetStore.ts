@@ -62,7 +62,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
-    imageUrl: '/Toyota%20Glanza.avif',
+    imageUrl: '/Toyota%20Glanza.jpeg.avif',
   },
   {
     id: 'c7',
