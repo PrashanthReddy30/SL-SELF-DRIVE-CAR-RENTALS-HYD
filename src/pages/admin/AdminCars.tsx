@@ -10,7 +10,8 @@ export default function AdminCars() {
 
   // Form State
   const [name, setName] = useState('');
-  const [carNumber, setCarNumber] = useState('');
+  const [carNumbers, setCarNumbers] = useState<string[]>([]);
+  const [currentNumberInput, setCurrentNumberInput] = useState('');
   const [category, setCategory] = useState<CarCategory>('Sedan');
   const [transmission, setTransmission] = useState<Transmission>('Automatic');
   const [fuelType, setFuelType] = useState<FuelType>('Petrol');
@@ -20,7 +21,8 @@ export default function AdminCars() {
   const openAddModal = () => {
     setEditingCar(null);
     setName('');
-    setCarNumber('');
+    setCarNumbers([]);
+    setCurrentNumberInput('');
     setCategory('Sedan');
     setTransmission('Automatic');
     setFuelType('Petrol');
@@ -32,7 +34,14 @@ export default function AdminCars() {
   const openEditModal = (car: Car) => {
     setEditingCar(car);
     setName(car.name);
-    setCarNumber(car.carNumber || '');
+    
+    const initialNumbers = car.carNumbers ? [...car.carNumbers] : [];
+    if (car.carNumber && !initialNumbers.includes(car.carNumber)) {
+      initialNumbers.push(car.carNumber);
+    }
+    setCarNumbers(initialNumbers);
+    setCurrentNumberInput('');
+    
     setCategory(car.category);
     setTransmission(car.transmission);
     setFuelType(car.fuelType || 'Petrol');
@@ -45,16 +54,27 @@ export default function AdminCars() {
     e.preventDefault();
     if (editingCar) {
       updateCar(editingCar.id, {
-        name, carNumber, category, transmission, fuelType, pricePerDay: Number(price), 
+        name, carNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
         imageUrl: imageUrl.trim() || editingCar.imageUrl
       });
     } else {
       addCar({
         id: Date.now().toString(),
-        name, carNumber, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
+        name, carNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: imageUrl.trim()
       });
     }
     setIsModalOpen(false);
+  };
+
+  const handleAddNumber = () => {
+    if (currentNumberInput.trim() && !carNumbers.includes(currentNumberInput.trim())) {
+      setCarNumbers([...carNumbers, currentNumberInput.trim()]);
+      setCurrentNumberInput('');
+    }
+  };
+
+  const handleRemoveNumber = (index: number) => {
+    setCarNumbers(carNumbers.filter((_, i) => i !== index));
   };
 
   return (
@@ -91,7 +111,11 @@ export default function AdminCars() {
                     <img src={car.imageUrl} alt={car.name} className="w-16 h-12 object-cover rounded-md" />
                   </td>
                   <td className="py-3 px-6 font-bold text-secondary">{car.name}</td>
-                  <td className="py-3 px-6 text-sm font-medium text-gray-500">{car.carNumber || '-'}</td>
+                  <td className="py-3 px-6 text-sm font-medium text-gray-500">
+                    {car.carNumbers && car.carNumbers.length > 0 
+                      ? car.carNumbers.join(', ') 
+                      : (car.carNumber || '-')}
+                  </td>
                   <td className="py-3 px-6">
                     <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-semibold">{car.category}</span>
                   </td>
@@ -126,8 +150,28 @@ export default function AdminCars() {
                   <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. Nissan GT-R" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
-                  <input type="text" value={carNumber} onChange={e => setCarNumber(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. TS 09 EA 1234" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Numbers</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={currentNumberInput} 
+                      onChange={e => setCurrentNumberInput(e.target.value)} 
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNumber(); } }}
+                      className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
+                      placeholder="e.g. TS 09 EA 1234" 
+                    />
+                    <button type="button" onClick={handleAddNumber} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-colors">Add</button>
+                  </div>
+                  {carNumbers.length > 0 && (
+                    <ul className="mt-3 space-y-2">
+                      {carNumbers.map((num, idx) => (
+                        <li key={idx} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                          <span className="text-sm font-semibold text-gray-700">{idx + 1}. {num}</span>
+                          <button type="button" onClick={() => handleRemoveNumber(idx)} className="text-red-400 hover:text-red-600"><X size={16} /></button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
               

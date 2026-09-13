@@ -18,6 +18,7 @@ export interface Car {
   id: string;
   name: string;
   carNumber?: string;
+  carNumbers?: string[];
   category: CarCategory;
   transmission: Transmission;
   fuelType: FuelType;
