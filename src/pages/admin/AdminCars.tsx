@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useFleetStore } from '../../store/fleetStore';
 import { Edit, Trash2, Plus, X } from 'lucide-react';
 import type { Car, CarCategory, Transmission, FuelType } from '../../types';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../lib/firebase';
 
 export default function AdminCars() {
   const { cars, addCar, updateCar, deleteCar } = useFleetStore();
@@ -66,8 +68,6 @@ export default function AdminCars() {
 
     try {
       if (imageFile) {
-        const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-        const { storage } = await import('../../lib/firebase');
         const storageRef = ref(storage, `cars/${Date.now()}_${imageFile.name}`);
         const snapshot = await uploadBytes(storageRef, imageFile);
         finalImageUrl = await getDownloadURL(snapshot.ref);
