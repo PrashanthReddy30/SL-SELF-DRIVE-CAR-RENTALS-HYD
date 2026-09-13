@@ -142,6 +142,7 @@ export default function AdminCars() {
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">IMAGE</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">NAME</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">REG NO.</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">OWNER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">CATEGORY</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TRANSMISSION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">FUEL</th>
@@ -158,8 +159,13 @@ export default function AdminCars() {
                   <td className="py-3 px-6 font-bold text-secondary">{car.name}</td>
                   <td className="py-3 px-6 text-sm font-medium text-gray-500">
                     {car.carNumbers && car.carNumbers.length > 0 
-                      ? car.carNumbers.map(cn => typeof cn === 'string' ? cn : `${cn.number}${cn.owner ? ` (${cn.owner})` : ''}`).join(', ') 
+                      ? car.carNumbers.map(cn => typeof cn === 'string' ? cn : cn.number).join(', ') 
                       : (car.carNumber || '-')}
+                  </td>
+                  <td className="py-3 px-6 text-sm text-gray-600">
+                    {car.carNumbers && car.carNumbers.length > 0 
+                      ? car.carNumbers.map(cn => typeof cn === 'string' ? '-' : (cn.owner || '-')).join(', ') 
+                      : '-'}
                   </td>
                   <td className="py-3 px-6">
                     <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-semibold">{car.category}</span>
