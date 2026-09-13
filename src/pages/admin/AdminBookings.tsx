@@ -17,6 +17,7 @@ export default function AdminBookings() {
 
   // Confirmation Modal State
   const [confirmingBooking, setConfirmingBooking] = useState<string | null>(null);
+  const [selectedRegNumber, setSelectedRegNumber] = useState('');
 
   const activeBookings = bookings.filter(b => b.status !== 'Completed');
 
@@ -37,6 +38,7 @@ export default function AdminBookings() {
       setExtraHours(0);
     } else if (newStatus === 'Confirmed') {
       setConfirmingBooking(bookingId);
+      setSelectedRegNumber('');
     } else {
       updateBookingStatus(bookingId, newStatus as any);
     }
@@ -56,7 +58,7 @@ export default function AdminBookings() {
     const extraCost = (days * perDayRate) + (hours * hourlyRate);
     const newTotal = targetBooking.totalPrice + extraCost;
 
-    completeBooking(completingBooking, days, hours, newTotal, targetCar.name, targetCar.carNumber);
+    completeBooking(completingBooking, days, hours, newTotal, targetCar.name, targetBooking.carNumber || targetCar.carNumber);
     
     // Create a temporary updated booking object to generate the accurate invoice instantly
     const updatedBooking = { ...targetBooking, status: 'Completed' as any, extraDays: days, extraHours: hours, totalPrice: newTotal };
@@ -224,8 +226,21 @@ export default function AdminBookings() {
                 <span className="font-semibold text-secondary">{targetConfirmCar.name}</span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Registration Number</span>
-                <span className="font-semibold text-secondary">{targetConfirmCar.carNumber || 'N/A'}</span>
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Assign Registration Number</span>
+                {targetConfirmCar.carNumbers && targetConfirmCar.carNumbers.length > 0 ? (
+                  <select 
+                    value={selectedRegNumber} 
+                    onChange={e => setSelectedRegNumber(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 outline-none mt-1"
+                  >
+                    <option value="">-- Select a Registration Number --</option>
+                    {targetConfirmCar.carNumbers.map(num => (
+                      <option key={num} value={num}>{num}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="font-semibold text-secondary">{targetConfirmCar.carNumber || 'N/A'}</span>
+                )}
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Customer Details</span>
@@ -236,8 +251,13 @@ export default function AdminBookings() {
 
             <button 
               onClick={() => {
-                updateBookingStatus(confirmingBooking, 'Confirmed');
+                if (targetConfirmCar?.carNumbers?.length && !selectedRegNumber) {
+                  alert('Please select a registration number to assign');
+                  return;
+                }
+                updateBookingStatus(confirmingBooking, 'Confirmed', selectedRegNumber || targetConfirmCar.carNumber);
                 setConfirmingBooking(null);
+                setSelectedRegNumber('');
               }}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-md"
             >
