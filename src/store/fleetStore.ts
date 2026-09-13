@@ -63,6 +63,10 @@ const initialCars: Car[] = [
     fuelType: 'Petrol',
     pricePerDay: 2000,
     imageUrl: '/Toyota%20Glanza.jpeg.avif',
+    carNumbers: [
+      { number: 'TS08JU1684', owner: 'Ramesh' },
+      { number: 'TS08KD1153', owner: 'Suresh' }
+    ]
   },
   {
     id: 'c7',
@@ -97,7 +101,7 @@ export const useFleetStore = create<FleetState>()(
       })),
     }),
     {
-      name: 'sl-fleet-storage-v9',
+      name: 'sl-fleet-storage-v10',
     }
   )
 );
