@@ -10,6 +10,7 @@ export default function AdminCars() {
 
   // Form State
   const [name, setName] = useState('');
+  const [carNumber, setCarNumber] = useState('');
   const [category, setCategory] = useState<CarCategory>('Sedan');
   const [transmission, setTransmission] = useState<Transmission>('Automatic');
   const [fuelType, setFuelType] = useState<FuelType>('Petrol');
@@ -19,6 +20,7 @@ export default function AdminCars() {
   const openAddModal = () => {
     setEditingCar(null);
     setName('');
+    setCarNumber('');
     setCategory('Sedan');
     setTransmission('Automatic');
     setFuelType('Petrol');
@@ -30,6 +32,7 @@ export default function AdminCars() {
   const openEditModal = (car: Car) => {
     setEditingCar(car);
     setName(car.name);
+    setCarNumber(car.carNumber || '');
     setCategory(car.category);
     setTransmission(car.transmission);
     setFuelType(car.fuelType || 'Petrol');
@@ -42,12 +45,12 @@ export default function AdminCars() {
     e.preventDefault();
     if (editingCar) {
       updateCar(editingCar.id, {
-        name, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
+        name, carNumber, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
       });
     } else {
       addCar({
         id: Date.now().toString(),
-        name, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
+        name, carNumber, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
       });
     }
     setIsModalOpen(false);
@@ -72,6 +75,7 @@ export default function AdminCars() {
               <tr className="bg-slate-50 border-b border-gray-200">
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">IMAGE</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">NAME</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">REG NO.</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">CATEGORY</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TRANSMISSION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">FUEL</th>
@@ -86,6 +90,7 @@ export default function AdminCars() {
                     <img src={car.imageUrl} alt={car.name} className="w-16 h-12 object-cover rounded-md" />
                   </td>
                   <td className="py-3 px-6 font-bold text-secondary">{car.name}</td>
+                  <td className="py-3 px-6 text-sm font-medium text-gray-500">{car.carNumber || '-'}</td>
                   <td className="py-3 px-6">
                     <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-semibold">{car.category}</span>
                   </td>
@@ -114,9 +119,15 @@ export default function AdminCars() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Car Model Name</label>
-                <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. Nissan GT-R" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Car Model Name</label>
+                  <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. Nissan GT-R" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
+                  <input type="text" value={carNumber} onChange={e => setCarNumber(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. TS 09 EA 1234" />
+                </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

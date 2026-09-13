@@ -17,6 +17,7 @@ export type FuelType = 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
 export interface Car {
   id: string;
   name: string;
+  carNumber?: string;
   category: CarCategory;
   transmission: Transmission;
   fuelType: FuelType;
