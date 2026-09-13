@@ -17,6 +17,8 @@ export default function AdminCars() {
   const [fuelType, setFuelType] = useState<FuelType>('Petrol');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const openAddModal = () => {
     setEditingCar(null);
@@ -28,6 +30,7 @@ export default function AdminCars() {
     setFuelType('Petrol');
     setPrice('');
     setImageUrl('');
+    setImageFile(null);
     setIsModalOpen(true);
   };
 
@@ -47,29 +50,52 @@ export default function AdminCars() {
     setFuelType(car.fuelType || 'Petrol');
     setPrice(car.pricePerDay.toString());
     setImageUrl(car.imageUrl);
+    setImageFile(null);
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editingCar && !imageUrl && !imageFile) {
+      alert("Please provide an image URL or upload an image.");
+      return;
+    }
     
-    const finalCarNumbers = [...carNumbers];
-    if (currentNumberInput.trim() && !finalCarNumbers.includes(currentNumberInput.trim())) {
-      finalCarNumbers.push(currentNumberInput.trim());
-    }
+    setIsUploading(true);
+    let finalImageUrl = imageUrl.trim();
 
-    if (editingCar) {
-      updateCar(editingCar.id, {
-        name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
-        imageUrl: imageUrl.trim() || editingCar.imageUrl
-      });
-    } else {
-      addCar({
-        id: Date.now().toString(),
-        name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: imageUrl.trim()
-      });
+    try {
+      if (imageFile) {
+        const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+        const { storage } = await import('../../lib/firebase');
+        const storageRef = ref(storage, `cars/${Date.now()}_${imageFile.name}`);
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        finalImageUrl = await getDownloadURL(snapshot.ref);
+      }
+
+      const finalCarNumbers = [...carNumbers];
+      if (currentNumberInput.trim() && !finalCarNumbers.includes(currentNumberInput.trim())) {
+        finalCarNumbers.push(currentNumberInput.trim());
+      }
+
+      if (editingCar) {
+        updateCar(editingCar.id, {
+          name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
+          imageUrl: finalImageUrl || editingCar.imageUrl
+        });
+      } else {
+        addCar({
+          id: Date.now().toString(),
+          name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: finalImageUrl
+        });
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
-    setIsModalOpen(false);
   };
 
   const handleAddNumber = () => {
@@ -214,20 +240,39 @@ export default function AdminCars() {
                 <input type="number" required value={price} onChange={e => setPrice(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none" placeholder="e.g. 5000" />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input 
-                  type="text" 
-                  required={!editingCar} 
-                  value={imageUrl} 
-                  onChange={e => setImageUrl(e.target.value)} 
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none" 
-                  placeholder={editingCar ? "Leave empty to keep existing image" : "https://..."} 
-                />
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Car Image</label>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-4">
+                    <label className="flex-1">
+                      <span className="text-xs text-gray-500 mb-1 block">Upload Local Image</span>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => { setImageFile(e.target.files?.[0] || null); setImageUrl(''); }}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                      />
+                    </label>
+                  </div>
+                  <div className="relative flex items-center py-2">
+                    <div className="flex-grow border-t border-gray-200"></div>
+                    <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-semibold">OR PASTE URL</span>
+                    <div className="flex-grow border-t border-gray-200"></div>
+                  </div>
+                  <div>
+                    <input 
+                      type="text" 
+                      value={imageUrl} 
+                      onChange={e => { setImageUrl(e.target.value); setImageFile(null); }} 
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none" 
+                      placeholder={editingCar ? "Leave empty to keep existing image" : "https://..."} 
+                    />
+                  </div>
+                </div>
               </div>
 
-              <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors mt-6">
-                {editingCar ? 'Save Changes' : 'Add Car'}
+              <button type="submit" disabled={isUploading} className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors mt-6 disabled:opacity-50">
+                {isUploading ? 'Uploading...' : editingCar ? 'Save Changes' : 'Add Car'}
               </button>
             </form>
           </div>
