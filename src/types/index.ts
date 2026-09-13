@@ -14,12 +14,16 @@ export type CarCategory = 'Sedan' | 'SUV' | 'MUV' | 'Hatchback' | 'Luxury' | 'Sp
 export type Transmission = 'Automatic' | 'Manual';
 export type FuelType = 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
 
+export interface CarRegistration {
+  number: string;
+  owner: string;
+}
+
 export interface Car {
   id: string;
   name: string;
   carNumber?: string;
-  carNumbers?: string[];
-  ownerName?: string;
+  carNumbers?: CarRegistration[];
   category: CarCategory;
   transmission: Transmission;
   fuelType: FuelType;

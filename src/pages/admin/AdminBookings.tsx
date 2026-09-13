@@ -234,9 +234,13 @@ export default function AdminBookings() {
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 outline-none mt-1"
                   >
                     <option value="">-- Select a Registration Number --</option>
-                    {targetConfirmCar.carNumbers.map(num => (
-                      <option key={num} value={num}>{num}</option>
-                    ))}
+                    {targetConfirmCar.carNumbers.map((cn, idx) => {
+                      const num = typeof cn === 'string' ? cn : cn.number;
+                      const owner = typeof cn === 'string' ? '' : cn.owner;
+                      return (
+                        <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>
+                      );
+                    })}
                   </select>
                 ) : (
                   <span className="font-semibold text-secondary">{targetConfirmCar.carNumber || 'N/A'}</span>

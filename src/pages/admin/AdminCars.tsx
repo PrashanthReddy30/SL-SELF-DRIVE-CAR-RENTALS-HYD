@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useFleetStore } from '../../store/fleetStore';
 import { Edit, Trash2, Plus, X } from 'lucide-react';
-import type { Car, CarCategory, Transmission, FuelType } from '../../types';
+import type { Car, CarCategory, Transmission, FuelType, CarRegistration } from '../../types';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../lib/firebase';
 
@@ -13,7 +13,7 @@ export default function AdminCars() {
   // Form State
   const [name, setName] = useState('');
   const [ownerName, setOwnerName] = useState('');
-  const [carNumbers, setCarNumbers] = useState<string[]>([]);
+  const [carNumbers, setCarNumbers] = useState<CarRegistration[]>([]);
   const [currentNumberInput, setCurrentNumberInput] = useState('');
   const [category, setCategory] = useState<CarCategory>('Sedan');
   const [transmission, setTransmission] = useState<Transmission>('Automatic');
@@ -41,11 +41,20 @@ export default function AdminCars() {
   const openEditModal = (car: Car) => {
     setEditingCar(car);
     setName(car.name);
-    setOwnerName(car.ownerName || '');
+    setOwnerName('');
     
-    const initialNumbers = car.carNumbers ? [...car.carNumbers] : [];
-    if (car.carNumber && !initialNumbers.includes(car.carNumber)) {
-      initialNumbers.push(car.carNumber);
+    const initialNumbers: CarRegistration[] = [];
+    if (car.carNumbers) {
+      car.carNumbers.forEach(cn => {
+        if (typeof cn === 'string') {
+          initialNumbers.push({ number: cn, owner: '' });
+        } else {
+          initialNumbers.push(cn);
+        }
+      });
+    }
+    if (car.carNumber && !initialNumbers.some(cn => cn.number === car.carNumber)) {
+      initialNumbers.push({ number: car.carNumber, owner: '' });
     }
     setCarNumbers(initialNumbers);
     setCurrentNumberInput('');
@@ -77,19 +86,19 @@ export default function AdminCars() {
       }
 
       const finalCarNumbers = [...carNumbers];
-      if (currentNumberInput.trim() && !finalCarNumbers.includes(currentNumberInput.trim())) {
-        finalCarNumbers.push(currentNumberInput.trim());
+      if (currentNumberInput.trim() && !finalCarNumbers.some(cn => cn.number === currentNumberInput.trim())) {
+        finalCarNumbers.push({ number: currentNumberInput.trim(), owner: ownerName.trim() });
       }
 
       if (editingCar) {
         updateCar(editingCar.id, {
-          name, ownerName: ownerName.trim(), carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
+          name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
           imageUrl: finalImageUrl || editingCar.imageUrl
         });
       } else {
         addCar({
           id: Date.now().toString(),
-          name, ownerName: ownerName.trim(), carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: finalImageUrl
+          name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: finalImageUrl
         });
       }
       setIsModalOpen(false);
@@ -102,9 +111,10 @@ export default function AdminCars() {
   };
 
   const handleAddNumber = () => {
-    if (currentNumberInput.trim() && !carNumbers.includes(currentNumberInput.trim())) {
-      setCarNumbers([...carNumbers, currentNumberInput.trim()]);
+    if (currentNumberInput.trim() && !carNumbers.some(cn => cn.number === currentNumberInput.trim())) {
+      setCarNumbers([...carNumbers, { number: currentNumberInput.trim(), owner: ownerName.trim() }]);
       setCurrentNumberInput('');
+      setOwnerName('');
     }
   };
 
@@ -131,7 +141,6 @@ export default function AdminCars() {
               <tr className="bg-slate-50 border-b border-gray-200">
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">IMAGE</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">NAME</th>
-                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">OWNER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">REG NO.</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">CATEGORY</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TRANSMISSION</th>
@@ -147,10 +156,9 @@ export default function AdminCars() {
                     <img src={car.imageUrl} alt={car.name} className="w-16 h-12 object-cover rounded-md" />
                   </td>
                   <td className="py-3 px-6 font-bold text-secondary">{car.name}</td>
-                  <td className="py-3 px-6 text-sm text-gray-600">{car.ownerName || '-'}</td>
                   <td className="py-3 px-6 text-sm font-medium text-gray-500">
                     {car.carNumbers && car.carNumbers.length > 0 
-                      ? car.carNumbers.join(', ') 
+                      ? car.carNumbers.map(cn => typeof cn === 'string' ? cn : `${cn.number}${cn.owner ? ` (${cn.owner})` : ''}`).join(', ') 
                       : (car.carNumber || '-')}
                   </td>
                   <td className="py-3 px-6">
@@ -181,19 +189,13 @@ export default function AdminCars() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Car Model Name</label>
-                    <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. Nissan GT-R" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Owner Name</label>
-                    <input type="text" value={ownerName} onChange={e => setOwnerName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. John Doe" />
-                  </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Car Model Name</label>
+                  <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="e.g. Nissan GT-R" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Numbers</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Numbers & Owners</label>
                   <div className="flex gap-2">
                     <input 
                       type="text" 
@@ -201,18 +203,30 @@ export default function AdminCars() {
                       onChange={e => setCurrentNumberInput(e.target.value)} 
                       onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNumber(); } }}
                       className="flex-1 min-w-[120px] border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
-                      placeholder="e.g. TS 09 EA 1234" 
+                      placeholder="Reg No (e.g. TS09...)" 
+                    />
+                    <input 
+                      type="text" 
+                      value={ownerName} 
+                      onChange={e => setOwnerName(e.target.value)} 
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNumber(); } }}
+                      className="flex-1 min-w-[120px] border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
+                      placeholder="Owner (e.g. Ramesh)" 
                     />
                     <button type="button" onClick={handleAddNumber} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-colors">Add</button>
                   </div>
                   {carNumbers.length > 0 && (
                     <ul className="mt-3 space-y-2">
-                      {carNumbers.map((num, idx) => (
-                        <li key={idx} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                          <span className="text-sm font-semibold text-gray-700">{idx + 1}. {num}</span>
-                          <button type="button" onClick={() => handleRemoveNumber(idx)} className="text-red-400 hover:text-red-600"><X size={16} /></button>
-                        </li>
-                      ))}
+                      {carNumbers.map((cn, idx) => {
+                        const num = typeof cn === 'string' ? cn : cn.number;
+                        const own = typeof cn === 'string' ? '' : cn.owner;
+                        return (
+                          <li key={idx} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                            <span className="text-sm font-semibold text-gray-700">{idx + 1}. {num} {own ? `(${own})` : ''}</span>
+                            <button type="button" onClick={() => handleRemoveNumber(idx)} className="text-red-400 hover:text-red-600"><X size={16} /></button>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </div>
