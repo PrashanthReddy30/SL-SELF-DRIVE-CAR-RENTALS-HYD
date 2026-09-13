@@ -137,7 +137,7 @@ export default function AdminCars() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-secondary/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8">
+          <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-secondary">{editingCar ? 'Edit Car' : 'Add New Car'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
@@ -157,7 +157,7 @@ export default function AdminCars() {
                       value={currentNumberInput} 
                       onChange={e => setCurrentNumberInput(e.target.value)} 
                       onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNumber(); } }}
-                      className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
+                      className="flex-1 min-w-[120px] border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
                       placeholder="e.g. TS 09 EA 1234" 
                     />
                     <button type="button" onClick={handleAddNumber} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-colors">Add</button>
