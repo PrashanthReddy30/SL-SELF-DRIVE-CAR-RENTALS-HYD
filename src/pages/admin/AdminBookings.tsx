@@ -15,6 +15,9 @@ export default function AdminBookings() {
   const [extraDays, setExtraDays] = useState<number | ''>(0);
   const [extraHours, setExtraHours] = useState<number | ''>(0);
 
+  // Confirmation Modal State
+  const [confirmingBooking, setConfirmingBooking] = useState<string | null>(null);
+
   const activeBookings = bookings.filter(b => b.status !== 'Completed');
 
   const startEditingNote = (id: string, currentNote: string = '') => {
@@ -32,6 +35,8 @@ export default function AdminBookings() {
       setCompletingBooking(bookingId);
       setExtraDays(0);
       setExtraHours(0);
+    } else if (newStatus === 'Confirmed') {
+      setConfirmingBooking(bookingId);
     } else {
       updateBookingStatus(bookingId, newStatus as any);
     }
@@ -67,6 +72,10 @@ export default function AdminBookings() {
   const hourlyRate = Math.round(perDayRate / 24);
   const currentExtraCost = (Number(extraDays || 0) * perDayRate) + (Number(extraHours || 0) * hourlyRate);
   const calculatedTotal = (targetBooking?.totalPrice || 0) + currentExtraCost;
+
+  // Variables for confirmation modal
+  const targetConfirmBooking = bookings.find(b => b.id === confirmingBooking);
+  const targetConfirmCar = cars.find(c => c.id === targetConfirmBooking?.carId);
 
   return (
     <div>
@@ -194,6 +203,45 @@ export default function AdminBookings() {
               className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-md"
             >
               Complete & Generate Invoice
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmingBooking && targetConfirmBooking && targetConfirmCar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setConfirmingBooking(null)}></div>
+          <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 md:p-8 animate-fade-in-up">
+            <button onClick={() => setConfirmingBooking(null)} className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
+              <X size={24} />
+            </button>
+            <h2 className="text-2xl font-bold text-secondary mb-6">Confirm Booking</h2>
+            
+            <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 mb-8 space-y-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Vehicle</span>
+                <span className="font-semibold text-secondary">{targetConfirmCar.name}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Registration Number</span>
+                <span className="font-semibold text-secondary">{targetConfirmCar.carNumber || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Customer Details</span>
+                <span className="font-medium text-gray-700">{targetConfirmBooking.customerName}</span>
+                <span className="text-sm text-gray-500">{targetConfirmBooking.customerPhone}</span>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => {
+                updateBookingStatus(confirmingBooking, 'Confirmed');
+                setConfirmingBooking(null);
+              }}
+              className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-md"
+            >
+              Confirmed
             </button>
           </div>
         </div>
