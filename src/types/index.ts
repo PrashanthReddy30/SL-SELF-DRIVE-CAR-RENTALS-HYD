@@ -19,6 +19,7 @@ export interface Car {
   name: string;
   carNumber?: string;
   carNumbers?: string[];
+  ownerName?: string;
   category: CarCategory;
   transmission: Transmission;
   fuelType: FuelType;
