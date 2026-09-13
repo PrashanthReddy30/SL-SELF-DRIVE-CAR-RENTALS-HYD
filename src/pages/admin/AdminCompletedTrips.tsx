@@ -38,7 +38,7 @@ export default function AdminCompletedTrips() {
         `"${b.customerName}"`,
         b.customerPhone,
         b.aadharNumber || '',
-        `"${car?.name || 'Unknown'}"`,
+        `"${b.carName || car?.name || 'Unknown'}${b.carNumber || car?.carNumber ? ` - ${b.carNumber || car?.carNumber}` : ''}"`,
         new Date(b.startDate).toLocaleDateString(),
         new Date(b.endDate).toLocaleDateString(),
         `"${b.pickupLocation}"`,
@@ -131,7 +131,10 @@ export default function AdminCompletedTrips() {
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           {car && <img src={car.imageUrl} alt={car.name} className="w-12 h-8 rounded object-cover" />}
-                          <span className="font-semibold text-sm text-secondary">{car?.name || 'Unknown'}</span>
+                          <span className="font-semibold text-sm text-secondary">
+                            {b.carName || car?.name || 'Unknown'}
+                            {(b.carNumber || car?.carNumber) ? ` - ${b.carNumber || car?.carNumber}` : ''}
+                          </span>
                         </div>
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-600">

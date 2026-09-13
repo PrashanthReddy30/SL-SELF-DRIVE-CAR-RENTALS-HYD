@@ -56,7 +56,7 @@ export default function AdminBookings() {
     const extraCost = (days * perDayRate) + (hours * hourlyRate);
     const newTotal = targetBooking.totalPrice + extraCost;
 
-    completeBooking(completingBooking, days, hours, newTotal);
+    completeBooking(completingBooking, days, hours, newTotal, targetCar.name, targetCar.carNumber);
     
     // Create a temporary updated booking object to generate the accurate invoice instantly
     const updatedBooking = { ...targetBooking, status: 'Completed' as any, extraDays: days, extraHours: hours, totalPrice: newTotal };

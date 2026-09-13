@@ -40,6 +40,8 @@ export interface Booking {
   totalPrice: number;
   extraDays?: number;
   extraHours?: number;
+  carName?: string;
+  carNumber?: string;
   aadhaarUrl?: string;
   status: BookingStatus;
   adminNote?: string;

@@ -9,7 +9,7 @@ interface BookingState {
   initialize: () => void;
   addBooking: (booking: Booking) => Promise<void>;
   updateBookingStatus: (id: string, status: Booking['status']) => Promise<void>;
-  completeBooking: (id: string, extraDays: number, extraHours: number, newTotal: number) => Promise<void>;
+  completeBooking: (id: string, extraDays: number, extraHours: number, newTotal: number, carName?: string, carNumber?: string) => Promise<void>;
   updateAdminNote: (id: string, note: string) => Promise<void>;
   cancelBooking: (id: string) => Promise<void>;
 }
@@ -40,13 +40,16 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     await updateDoc(doc(db, 'bookings', id), { status });
   },
 
-  completeBooking: async (id, extraDays, extraHours, newTotal) => {
-    await updateDoc(doc(db, 'bookings', id), { 
+  completeBooking: async (id, extraDays, extraHours, newTotal, carName, carNumber) => {
+    const updateData: any = { 
       status: 'Completed',
       extraDays,
       extraHours,
       totalPrice: newTotal
-    });
+    };
+    if (carName) updateData.carName = carName;
+    if (carNumber) updateData.carNumber = carNumber;
+    await updateDoc(doc(db, 'bookings', id), updateData);
   },
 
   updateAdminNote: async (id, adminNote) => {
