@@ -52,15 +52,21 @@ export default function AdminCars() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const finalCarNumbers = [...carNumbers];
+    if (currentNumberInput.trim() && !finalCarNumbers.includes(currentNumberInput.trim())) {
+      finalCarNumbers.push(currentNumberInput.trim());
+    }
+
     if (editingCar) {
       updateCar(editingCar.id, {
-        name, carNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
+        name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
         imageUrl: imageUrl.trim() || editingCar.imageUrl
       });
     } else {
       addCar({
         id: Date.now().toString(),
-        name, carNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: imageUrl.trim()
+        name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: imageUrl.trim()
       });
     }
     setIsModalOpen(false);
