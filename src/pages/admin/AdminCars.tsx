@@ -45,7 +45,8 @@ export default function AdminCars() {
     e.preventDefault();
     if (editingCar) {
       updateCar(editingCar.id, {
-        name, carNumber, category, transmission, fuelType, pricePerDay: Number(price), imageUrl
+        name, carNumber, category, transmission, fuelType, pricePerDay: Number(price), 
+        imageUrl: imageUrl.trim() || editingCar.imageUrl
       });
     } else {
       addCar({
@@ -165,7 +166,14 @@ export default function AdminCars() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input type="url" required value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none" placeholder="https://..." />
+                <input 
+                  type="text" 
+                  required={!editingCar} 
+                  value={imageUrl} 
+                  onChange={e => setImageUrl(e.target.value)} 
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none" 
+                  placeholder={editingCar ? "Leave empty to keep existing image" : "https://..."} 
+                />
               </div>
 
               <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors mt-6">
