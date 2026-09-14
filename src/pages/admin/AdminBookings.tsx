@@ -27,6 +27,7 @@ export default function AdminBookings() {
   const [walkInPhone, setWalkInPhone] = useState('');
   const [walkInAadhaar, setWalkInAadhaar] = useState('');
   const [walkInCarId, setWalkInCarId] = useState('');
+  const [walkInCarNumber, setWalkInCarNumber] = useState('');
   const [walkInStartDate, setWalkInStartDate] = useState('');
   const [walkInEndDate, setWalkInEndDate] = useState('');
   const [walkInLocation, setWalkInLocation] = useState('Office');
@@ -71,6 +72,7 @@ export default function AdminBookings() {
     await useBookingStore.getState().addBooking({
       id: bookingId,
       carId: walkInCarId,
+      carNumber: walkInCarNumber,
       customerName: walkInName,
       customerPhone: walkInPhone,
       aadharNumber: walkInAadhaar,
@@ -88,6 +90,7 @@ export default function AdminBookings() {
     setWalkInPhone('');
     setWalkInAadhaar('');
     setWalkInCarId('');
+    setWalkInCarNumber('');
     setWalkInStartDate('');
     setWalkInEndDate('');
     setWalkInPrice('');
@@ -186,8 +189,23 @@ export default function AdminBookings() {
                         )}
                       </div>
                     </td>
-                    <td className="py-4 px-6 font-semibold text-secondary">
-                      {cars.find(c => c.id === b.carId)?.name || 'Unknown'}
+                    <td className="py-4 px-6">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-secondary">{cars.find(c => c.id === b.carId)?.name || 'Unknown'}</span>
+                        {b.carNumber && (() => {
+                          const car = cars.find(c => c.id === b.carId);
+                          let ownerName = '';
+                          if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
+                            const regObj = (car.carNumbers as any[]).find(cn => cn.number === b.carNumber);
+                            if (regObj) ownerName = regObj.owner;
+                          }
+                          return (
+                            <span className="text-xs text-gray-500 font-mono mt-1">
+                              Reg: {b.carNumber} {ownerName && <span className="text-blue-600 font-semibold ml-1">| {ownerName}</span>}
+                            </span>
+                          );
+                        })()}
+                      </div>
                     </td>
                     <td className="py-4 px-6 text-sm">
                       <div className="text-gray-700">{new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}</div>
@@ -377,12 +395,23 @@ export default function AdminBookings() {
                   <input type="text" value={walkInAadhaar} onChange={e => setWalkInAadhaar(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Car</label>
-                  <select required value={walkInCarId} onChange={e => setWalkInCarId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Car Model</label>
+                  <select required value={walkInCarId} onChange={e => { setWalkInCarId(e.target.value); setWalkInCarNumber(''); }} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
                     <option value="">-- Choose a Car --</option>
                     {cars.map(c => (
                       <option key={c.id} value={c.id}>{c.name} (₹{c.pricePerDay}/day)</option>
                     ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Registration (Optional)</label>
+                  <select value={walkInCarNumber} onChange={e => setWalkInCarNumber(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
+                    <option value="">-- Choose Registration --</option>
+                    {walkInCarId && cars.find(c => c.id === walkInCarId)?.carNumbers?.map((cn, idx) => {
+                      const num = typeof cn === 'string' ? cn : cn.number;
+                      const owner = typeof cn === 'string' ? '' : cn.owner;
+                      return <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>;
+                    })}
                   </select>
                 </div>
                 <div>
