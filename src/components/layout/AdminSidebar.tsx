@@ -5,10 +5,16 @@ import {
   CalendarDays, 
   CheckCircle2, 
   ArrowLeft,
-  MessageSquare
+  MessageSquare,
+  X
 } from 'lucide-react';
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const navItems = [
     { name: 'Dashboard', path: '/admin', end: true, icon: LayoutDashboard },
     { name: 'Rental Cars', path: '/admin/cars', icon: CarFront },
@@ -18,21 +24,41 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-[#0A192F] min-h-screen text-slate-300 flex flex-col hidden md:flex border-r border-slate-800">
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
-            SL
-          </div>
-          <span className="font-bold text-lg text-white">Admin Portal</span>
-        </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+          onClick={onClose}
+        />
+      )}
 
-        <nav className="space-y-2">
+      {/* Sidebar */}
+      <aside 
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0A192F] text-slate-300 flex flex-col border-r border-slate-800 transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
+                SL
+              </div>
+              <span className="font-bold text-lg text-white">Admin Portal</span>
+            </div>
+            <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white">
+              <X size={24} />
+            </button>
+          </div>
+
+          <nav className="space-y-2">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.end}
+              onClick={onClose}
               className={({ isActive }) => 
                 `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                   isActive 
@@ -55,8 +81,9 @@ export default function AdminSidebar() {
         >
           <ArrowLeft size={20} />
           Back to Site
-        </NavLink>
-      </div>
-    </aside>
+          </NavLink>
+        </div>
+      </aside>
+    </>
   );
 }
