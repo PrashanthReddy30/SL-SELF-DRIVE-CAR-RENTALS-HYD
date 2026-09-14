@@ -1,12 +1,15 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { db } from '../lib/firebase';
+import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import type { Car } from '../types';
 
 interface FleetState {
   cars: Car[];
-  addCar: (car: Car) => void;
-  updateCar: (id: string, car: Partial<Car>) => void;
-  deleteCar: (id: string) => void;
+  isInitialized: boolean;
+  initialize: () => void;
+  addCar: (car: Car) => Promise<void>;
+  updateCar: (id: string, updatedFields: Partial<Car>) => Promise<void>;
+  deleteCar: (id: string) => Promise<void>;
 }
 
 const initialCars: Car[] = [
@@ -88,20 +91,41 @@ const initialCars: Car[] = [
   }
 ];
 
-export const useFleetStore = create<FleetState>()(
-  persist(
-    (set) => ({
-      cars: initialCars,
-      addCar: (car) => set((state) => ({ cars: [...state.cars, car] })),
-      updateCar: (id, updatedFields) => set((state) => ({
-        cars: state.cars.map(c => c.id === id ? { ...c, ...updatedFields } : c)
-      })),
-      deleteCar: (id) => set((state) => ({
-        cars: state.cars.filter(c => c.id !== id)
-      })),
-    }),
-    {
-      name: 'sl-fleet-storage-v10',
+export const useFleetStore = create<FleetState>((set, get) => ({
+  cars: [],
+  isInitialized: false,
+
+  initialize: async () => {
+    if (get().isInitialized) return;
+    
+    const carsRef = collection(db, 'cars');
+    
+    // Check if empty and seed initial data
+    const snapshot = await getDocs(carsRef);
+    if (snapshot.empty) {
+      console.log('Seeding initial cars to Firestore...');
+      for (const car of initialCars) {
+        await setDoc(doc(db, 'cars', car.id), car);
+      }
     }
-  )
-);
+
+    onSnapshot(carsRef, (snapshot: any) => {
+      const carsData = snapshot.docs.map((doc: any) => doc.data() as Car);
+      set({ cars: carsData });
+    });
+
+    set({ isInitialized: true });
+  },
+
+  addCar: async (car) => {
+    await setDoc(doc(db, 'cars', car.id), car);
+  },
+
+  updateCar: async (id, updatedFields) => {
+    await updateDoc(doc(db, 'cars', id), updatedFields as any);
+  },
+
+  deleteCar: async (id) => {
+    await deleteDoc(doc(db, 'cars', id));
+  }
+}));

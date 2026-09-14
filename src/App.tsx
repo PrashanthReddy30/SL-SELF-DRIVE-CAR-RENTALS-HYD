@@ -24,12 +24,14 @@ import { useInquiryStore } from './store/inquiryStore';
 import { useBookingStore } from './store/bookingStore';
 
 import { useAuthStore } from './store/authStore';
+import { useFleetStore } from './store/fleetStore';
 
 function App() {
   useEffect(() => {
     useInquiryStore.getState().initialize();
     useBookingStore.getState().initialize();
     useAuthStore.getState().initialize();
+    useFleetStore.getState().initialize();
   }, []);
   return (
     <Router>
