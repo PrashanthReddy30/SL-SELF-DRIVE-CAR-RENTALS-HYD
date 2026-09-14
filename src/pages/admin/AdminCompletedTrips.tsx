@@ -109,6 +109,8 @@ export default function AdminCompletedTrips() {
               <tr className="bg-slate-50 border-b border-gray-200">
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">CUSTOMER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">VEHICLE</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">VEHICLE NUMBER</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">OWNER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TRIP DATES</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DESTINATION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">REVENUE</th>
@@ -118,7 +120,7 @@ export default function AdminCompletedTrips() {
             <tbody>
               {filteredTrips.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">No completed trips found.</td>
+                  <td colSpan={8} className="py-8 text-center text-gray-500">No completed trips found.</td>
                 </tr>
               ) : (
                 filteredTrips.map(b => {
@@ -147,15 +149,14 @@ export default function AdminCompletedTrips() {
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           {car && <img src={car.imageUrl} alt={car.name} className="w-12 h-8 rounded object-cover" />}
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-sm text-secondary">{carName}</span>
-                            {carNumber && (
-                              <span className="text-xs text-gray-500 font-mono mt-0.5">
-                                Reg: {carNumber} {ownerName && <span className="text-blue-600 font-semibold ml-1">| {ownerName}</span>}
-                              </span>
-                            )}
-                          </div>
+                          <span className="font-semibold text-sm text-secondary">{carName}</span>
                         </div>
+                      </td>
+                      <td className="py-4 px-6 font-mono text-gray-600">
+                        {carNumber || '-'}
+                      </td>
+                      <td className="py-4 px-6 text-sm font-semibold text-gray-700">
+                        {ownerName || '-'}
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-600">
                         {new Date(b.startDate).toLocaleDateString()} &rarr; {new Date(b.endDate).toLocaleDateString()}

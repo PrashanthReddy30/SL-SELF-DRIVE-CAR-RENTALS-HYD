@@ -167,6 +167,8 @@ export default function AdminBookings() {
               <tr className="bg-slate-50 border-b border-gray-200">
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">BOOKING ID</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">VEHICLE</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">VEHICLE NUMBER</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">OWNER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DATES & LOCATION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TOTAL</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">STATUS</th>
@@ -176,7 +178,7 @@ export default function AdminBookings() {
             <tbody>
               {activeBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">No active bookings found.</td>
+                  <td colSpan={8} className="py-8 text-center text-gray-500">No active bookings found.</td>
                 </tr>
               ) : (
                 activeBookings.map(b => (
@@ -189,24 +191,23 @@ export default function AdminBookings() {
                         )}
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-secondary">{cars.find(c => c.id === b.carId)?.name || 'Unknown'}</span>
-                        {b.carNumber && (() => {
-                          const car = cars.find(c => c.id === b.carId);
-                          let ownerName = '';
-                          if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
-                            const regObj = (car.carNumbers as any[]).find(cn => cn.number === b.carNumber);
-                            if (regObj) ownerName = regObj.owner;
-                          }
-                          return (
-                            <span className="text-xs text-gray-500 font-mono mt-1">
-                              Reg: {b.carNumber} {ownerName && <span className="text-blue-600 font-semibold ml-1">| {ownerName}</span>}
-                            </span>
-                          );
-                        })()}
-                      </div>
+                    <td className="py-4 px-6 font-semibold text-secondary">
+                      {cars.find(c => c.id === b.carId)?.name || 'Unknown'}
                     </td>
+                    {(() => {
+                      const car = cars.find(c => c.id === b.carId);
+                      let ownerName = '-';
+                      if (b.carNumber && car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
+                        const regObj = (car.carNumbers as any[]).find(cn => cn.number === b.carNumber);
+                        if (regObj && regObj.owner) ownerName = regObj.owner;
+                      }
+                      return (
+                        <>
+                          <td className="py-4 px-6 font-mono text-gray-600">{b.carNumber || '-'}</td>
+                          <td className="py-4 px-6 text-sm font-semibold text-gray-700">{ownerName}</td>
+                        </>
+                      );
+                    })()}
                     <td className="py-4 px-6 text-sm">
                       <div className="text-gray-700">{new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}</div>
                       <div className="text-gray-500 text-xs mt-1">{b.pickupLocation}</div>
