@@ -42,7 +42,7 @@ export const useInquiryStore = create<InquiryState>((set, get) => ({
             
             const timeString = new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            toast((t) => (
+            toast(() => (
               <div className="flex flex-col gap-1">
                 <span className="font-bold">New Inquiry Received!</span>
                 <span className="text-sm">From: <b>{data.name}</b></span>

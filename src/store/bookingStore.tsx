@@ -37,7 +37,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
               const carName = useFleetStore.getState().cars.find(c => c.id === data.carId)?.name || 'a vehicle';
               const timeString = new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
               
-              toast((t) => (
+              toast(() => (
                 <div className="flex flex-col gap-1">
                   <span className="font-bold">New Booking Received!</span>
                   <span className="text-sm"><b>{data.customerName}</b> booked <b>{carName}</b></span>
