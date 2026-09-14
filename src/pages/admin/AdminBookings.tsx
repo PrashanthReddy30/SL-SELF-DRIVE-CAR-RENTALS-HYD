@@ -1,12 +1,14 @@
 import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Save, X, Plus } from 'lucide-react';
 import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function AdminBookings() {
   const { bookings, updateBookingStatus, updateAdminNote, completeBooking } = useBookingStore();
   const { cars } = useFleetStore();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState('');
   
@@ -31,6 +33,14 @@ export default function AdminBookings() {
   const [walkInPrice, setWalkInPrice] = useState<number | ''>('');
 
   const activeBookings = bookings.filter(b => b.status !== 'Completed');
+
+  // Open modal if query param is present
+  useEffect(() => {
+    if (searchParams.get('new') === 'walk-in') {
+      setIsWalkInModalOpen(true);
+      setSearchParams({}); // Clear query param after opening
+    }
+  }, [searchParams, setSearchParams]);
 
   // Auto-calculate walk-in price when dates or car changes
   useEffect(() => {

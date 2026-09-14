@@ -6,7 +6,8 @@ import {
   CheckCircle2, 
   ArrowLeft,
   MessageSquare,
-  X
+  X,
+  PlusCircle
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -18,6 +19,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const navItems = [
     { name: 'Dashboard', path: '/admin', end: true, icon: LayoutDashboard },
     { name: 'Rental Cars', path: '/admin/cars', icon: CarFront },
+    { name: 'Walk-in Booking', path: '/admin/bookings?new=walk-in', icon: PlusCircle },
     { name: 'Inquiries', path: '/admin/inquiries', icon: MessageSquare },
     { name: 'Bookings', path: '/admin/bookings', icon: CalendarDays },
     { name: 'Completed Trips', path: '/admin/completed-trips', icon: CheckCircle2 },
@@ -53,24 +55,27 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           </div>
 
           <nav className="space-y-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.end}
-              onClick={onClose}
-              className={({ isActive }) => 
-                `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary' 
-                    : 'hover:bg-white/5 hover:text-white'
-                }`
-              }
-            >
-              <item.icon size={20} className="shrink-0" />
-              {item.name}
-            </NavLink>
-          ))}
+          {navItems.map((item) => {
+            const isWalkInLink = item.path.includes('?new=walk-in');
+            return (
+              <NavLink
+                key={item.name}
+                to={item.path}
+                end={item.end}
+                onClick={onClose}
+                className={({ isActive }) => 
+                  `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                    (isActive && !isWalkInLink) 
+                      ? 'bg-primary/10 text-primary' 
+                      : 'hover:bg-white/5 hover:text-white'
+                  }`
+                }
+              >
+                <item.icon size={20} className="shrink-0" />
+                {item.name}
+              </NavLink>
+            );
+          })}
         </nav>
       </div>
 
