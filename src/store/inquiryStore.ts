@@ -39,9 +39,19 @@ export const useInquiryStore = create<InquiryState>((set, get) => ({
           if (change.type === 'added') {
             const data = change.doc.data() as Inquiry;
             playAlertSound();
-            toast(`New Inquiry: ${data.name}`, {
+            
+            const timeString = new Date(data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            toast((t) => (
+              <div className="flex flex-col gap-1">
+                <span className="font-bold">New Inquiry Received!</span>
+                <span className="text-sm">From: <b>{data.name}</b></span>
+                {data.carName && <span className="text-xs text-gray-300">Car: {data.carName}</span>}
+                <span className="text-xs text-gray-400 mt-1">{timeString}</span>
+              </div>
+            ), {
               icon: '💬',
-              duration: 5000,
+              duration: 6000,
               style: { borderRadius: '10px', background: '#333', color: '#fff' }
             });
           }
