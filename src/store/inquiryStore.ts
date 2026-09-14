@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { playAlertSound } from '../utils/playAlertSound';
+import toast from 'react-hot-toast';
 
 export interface Inquiry {
   id: string;
@@ -29,7 +31,24 @@ export const useInquiryStore = create<InquiryState>((set, get) => ({
   initialize: () => {
     if (get().isInitialized) return;
     
+    let isInitialLoad = true;
+    
     onSnapshot(collection(db, 'inquiries'), (snapshot: any) => {
+      if (!isInitialLoad) {
+        snapshot.docChanges().forEach((change: any) => {
+          if (change.type === 'added') {
+            const data = change.doc.data() as Inquiry;
+            playAlertSound();
+            toast(`New Inquiry: ${data.name}`, {
+              icon: '💬',
+              duration: 5000,
+              style: { borderRadius: '10px', background: '#333', color: '#fff' }
+            });
+          }
+        });
+      }
+      isInitialLoad = false;
+
       const inquiriesData = snapshot.docs.map((doc: any) => doc.data() as Inquiry);
       // Sort by createdAt descending
       inquiriesData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

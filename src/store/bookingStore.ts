@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import type { Booking } from '../types';
+import { playAlertSound } from '../utils/playAlertSound';
+import toast from 'react-hot-toast';
 
 interface BookingState {
   bookings: Booking[];
@@ -21,7 +23,26 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   initialize: () => {
     if (get().isInitialized) return;
     
+    let isInitialLoad = true;
+    
     onSnapshot(collection(db, 'bookings'), (snapshot: any) => {
+      if (!isInitialLoad) {
+        snapshot.docChanges().forEach((change: any) => {
+          if (change.type === 'added') {
+            const data = change.doc.data() as Booking;
+            if (data.source !== 'walk-in') {
+              playAlertSound();
+              toast(`New Booking: ${data.customerName}`, {
+                icon: '🚙',
+                duration: 5000,
+                style: { borderRadius: '10px', background: '#333', color: '#fff' }
+              });
+            }
+          }
+        });
+      }
+      isInitialLoad = false;
+
       const bookingsData = snapshot.docs.map((doc: any) => doc.data() as Booking);
       // Sort by createdAt descending
       bookingsData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

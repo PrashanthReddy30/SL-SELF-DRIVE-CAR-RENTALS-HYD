@@ -3,6 +3,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import { useAuthStore } from '../../store/authStore';
 import { Menu } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
 export default function AdminLayout() {
   const { user, isAuthenticated } = useAuthStore();
@@ -14,6 +15,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen flex bg-slate-50">
+      <Toaster position="top-right" />
       <AdminSidebar 
         isOpen={isMobileSidebarOpen} 
         onClose={() => setIsMobileSidebarOpen(false)} 
