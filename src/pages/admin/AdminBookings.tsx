@@ -2,7 +2,7 @@ import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MessageSquare, Save, X, Plus } from 'lucide-react';
+import { MessageSquare, Save, X } from 'lucide-react';
 import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function AdminBookings() {
