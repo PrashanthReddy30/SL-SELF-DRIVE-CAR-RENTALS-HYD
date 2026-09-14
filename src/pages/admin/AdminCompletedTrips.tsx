@@ -35,7 +35,12 @@ export default function AdminCompletedTrips() {
       const car = cars.find(c => c.id === b.carId);
       const carName = b.carName || car?.name || 'Unknown';
       const carNumber = b.carNumber || car?.carNumber;
-      const carDisplayName = carNumber ? `${carName} - ${carNumber}` : carName;
+      let ownerName = '';
+      if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
+        const regObj = (car.carNumbers as any[]).find(cn => cn.number === carNumber);
+        if (regObj) ownerName = regObj.owner;
+      }
+      const carDisplayName = carNumber ? `${carName} - ${carNumber}${ownerName ? ` (${ownerName})` : ''}` : carName;
       return [
         b.id,
         `"${b.customerName}"`,
@@ -120,7 +125,12 @@ export default function AdminCompletedTrips() {
                   const car = cars.find(c => c.id === b.carId);
                   const carName = b.carName || car?.name || 'Unknown';
                   const carNumber = b.carNumber || car?.carNumber;
-                  const carDisplayName = carNumber ? `${carName} - ${carNumber}` : carName;
+                  let ownerName = '';
+                  if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
+                    const regObj = (car.carNumbers as any[]).find(cn => cn.number === carNumber);
+                    if (regObj) ownerName = regObj.owner;
+                  }
+                  
                   return (
                     <tr key={b.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-4 px-6">
@@ -137,7 +147,14 @@ export default function AdminCompletedTrips() {
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           {car && <img src={car.imageUrl} alt={car.name} className="w-12 h-8 rounded object-cover" />}
-                          <span className="font-semibold text-sm text-secondary">{carDisplayName}</span>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-sm text-secondary">{carName}</span>
+                            {carNumber && (
+                              <span className="text-xs text-gray-500 font-mono mt-0.5">
+                                Reg: {carNumber} {ownerName && <span className="text-blue-600 font-semibold ml-1">| {ownerName}</span>}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-600">
