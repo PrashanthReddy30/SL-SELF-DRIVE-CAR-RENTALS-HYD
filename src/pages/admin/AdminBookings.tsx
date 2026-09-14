@@ -1,7 +1,7 @@
 import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
-import { useState } from 'react';
-import { MessageSquare, Save, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MessageSquare, Save, X, Plus } from 'lucide-react';
 import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function AdminBookings() {
@@ -19,7 +19,69 @@ export default function AdminBookings() {
   const [confirmingBooking, setConfirmingBooking] = useState<string | null>(null);
   const [selectedRegNumber, setSelectedRegNumber] = useState('');
 
+  // Walk-in Booking State
+  const [isWalkInModalOpen, setIsWalkInModalOpen] = useState(false);
+  const [walkInName, setWalkInName] = useState('');
+  const [walkInPhone, setWalkInPhone] = useState('');
+  const [walkInAadhaar, setWalkInAadhaar] = useState('');
+  const [walkInCarId, setWalkInCarId] = useState('');
+  const [walkInStartDate, setWalkInStartDate] = useState('');
+  const [walkInEndDate, setWalkInEndDate] = useState('');
+  const [walkInLocation, setWalkInLocation] = useState('Office');
+  const [walkInPrice, setWalkInPrice] = useState<number | ''>('');
+
   const activeBookings = bookings.filter(b => b.status !== 'Completed');
+
+  // Auto-calculate walk-in price when dates or car changes
+  useEffect(() => {
+    if (walkInCarId && walkInStartDate && walkInEndDate) {
+      const selectedCar = cars.find(c => c.id === walkInCarId);
+      if (selectedCar) {
+        const start = new Date(walkInStartDate);
+        const end = new Date(walkInEndDate);
+        if (end > start) {
+          const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+          setWalkInPrice(days * selectedCar.pricePerDay);
+        } else {
+          setWalkInPrice('');
+        }
+      }
+    }
+  }, [walkInCarId, walkInStartDate, walkInEndDate, cars]);
+
+  const handleAddWalkInBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!walkInCarId || !walkInStartDate || !walkInEndDate || walkInPrice === '') return;
+    
+    const selectedCar = cars.find(c => c.id === walkInCarId);
+    if (!selectedCar) return;
+
+    const bookingId = 'BK' + Date.now().toString().slice(-6);
+    
+    await useBookingStore.getState().addBooking({
+      id: bookingId,
+      carId: walkInCarId,
+      customerName: walkInName,
+      customerPhone: walkInPhone,
+      aadharNumber: walkInAadhaar,
+      startDate: new Date(walkInStartDate).toISOString(),
+      endDate: new Date(walkInEndDate).toISOString(),
+      pickupLocation: walkInLocation,
+      totalPrice: Number(walkInPrice),
+      status: 'Confirmed',
+      source: 'walk-in',
+      createdAt: new Date().toISOString()
+    });
+
+    setIsWalkInModalOpen(false);
+    setWalkInName('');
+    setWalkInPhone('');
+    setWalkInAadhaar('');
+    setWalkInCarId('');
+    setWalkInStartDate('');
+    setWalkInEndDate('');
+    setWalkInPrice('');
+  };
 
   const startEditingNote = (id: string, currentNote: string = '') => {
     setEditingNote(id);
@@ -81,7 +143,15 @@ export default function AdminBookings() {
 
   return (
     <div>
-      <h1 className="text-2xl sm:text-3xl font-bold text-secondary mb-8">Active Bookings</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-secondary">Active Bookings</h1>
+        <button 
+          onClick={() => setIsWalkInModalOpen(true)}
+          className="bg-primary text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-hover transition-colors flex items-center gap-2"
+        >
+          <Plus size={18} /> Walk-in Booking
+        </button>
+      </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
@@ -104,7 +174,14 @@ export default function AdminBookings() {
               ) : (
                 activeBookings.map(b => (
                   <tr key={b.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-4 px-6 font-mono text-sm text-gray-500">{b.id.slice(0, 8)}</td>
+                    <td className="py-4 px-6 font-mono text-sm text-gray-500">
+                      <div className="flex items-center gap-2">
+                        {b.id.slice(0, 8)}
+                        {b.source === 'walk-in' && (
+                          <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">Walk-in</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="py-4 px-6 font-semibold text-secondary">
                       {cars.find(c => c.id === b.carId)?.name || 'Unknown'}
                     </td>
@@ -267,6 +344,65 @@ export default function AdminBookings() {
             >
               Confirmed
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Walk-in Booking Modal */}
+      {isWalkInModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsWalkInModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 animate-fade-in-up">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-secondary">Add Walk-in Booking</h2>
+              <button onClick={() => setIsWalkInModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+            </div>
+
+            <form onSubmit={handleAddWalkInBooking} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+                  <input type="text" required value={walkInName} onChange={e => setWalkInName(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input type="tel" required value={walkInPhone} onChange={e => setWalkInPhone(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Aadhaar Number (Optional)</label>
+                  <input type="text" value={walkInAadhaar} onChange={e => setWalkInAadhaar(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Car</label>
+                  <select required value={walkInCarId} onChange={e => setWalkInCarId(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
+                    <option value="">-- Choose a Car --</option>
+                    {cars.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} (₹{c.pricePerDay}/day)</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                  <input type="datetime-local" required value={walkInStartDate} onChange={e => setWalkInStartDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
+                  <input type="datetime-local" required value={walkInEndDate} onChange={e => setWalkInEndDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Pickup Location</label>
+                  <input type="text" required value={walkInLocation} onChange={e => setWalkInLocation(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Total Price (₹)</label>
+                  <input type="number" required value={walkInPrice} onChange={e => setWalkInPrice(e.target.value === '' ? '' : Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+                  <p className="text-xs text-gray-500 mt-1">Auto-calculated, but can be overridden.</p>
+                </div>
+              </div>
+              <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors mt-6">
+                Save Booking
+              </button>
+            </form>
           </div>
         </div>
       )}

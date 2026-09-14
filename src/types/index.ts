@@ -51,5 +51,6 @@ export interface Booking {
   aadhaarUrl?: string;
   status: BookingStatus;
   adminNote?: string;
+  source?: 'online' | 'walk-in';
   createdAt: string;
 }
