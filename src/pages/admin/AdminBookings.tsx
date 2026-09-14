@@ -155,12 +155,6 @@ export default function AdminBookings() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-secondary">Active Bookings</h1>
-        <button 
-          onClick={() => setIsWalkInModalOpen(true)}
-          className="bg-primary text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-hover transition-colors flex items-center gap-2"
-        >
-          <Plus size={18} /> Walk-in Booking
-        </button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
