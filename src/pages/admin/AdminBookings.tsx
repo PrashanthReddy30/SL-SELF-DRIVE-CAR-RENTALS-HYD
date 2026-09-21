@@ -3,7 +3,6 @@ import { useFleetStore } from '../../store/fleetStore';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Save, X } from 'lucide-react';
-import { generateInvoice } from '../../utils/generateInvoice';
 
 export default function AdminBookings() {
   const { bookings, updateBookingStatus, updateAdminNote, completeBooking } = useBookingStore();
@@ -134,10 +133,6 @@ export default function AdminBookings() {
     const newTotal = targetBooking.totalPrice + extraCost;
 
     completeBooking(completingBooking, days, hours, newTotal, targetCar.name, targetBooking.carNumber || targetCar.carNumber);
-    
-    // Create a temporary updated booking object to generate the accurate invoice instantly
-    const updatedBooking = { ...targetBooking, status: 'Completed' as any, extraDays: days, extraHours: hours, totalPrice: newTotal };
-    generateInvoice(updatedBooking, targetCar);
     
     setCompletingBooking(null);
   };
@@ -306,7 +301,7 @@ export default function AdminBookings() {
               onClick={handleCompleteSubmit}
               className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-md"
             >
-              Complete & Generate Invoice
+              Complete Booking
             </button>
           </div>
         </div>
