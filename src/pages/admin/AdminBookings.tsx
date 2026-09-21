@@ -33,7 +33,7 @@ export default function AdminBookings() {
   const [walkInLocation, setWalkInLocation] = useState('Office');
   const [walkInPrice, setWalkInPrice] = useState<number | ''>('');
 
-  const activeBookings = bookings.filter(b => b.status !== 'Completed');
+  const activeBookings = bookings.filter(b => b.status !== 'Completed' && b.status !== 'Cancelled');
 
   // Open modal if query param is present
   useEffect(() => {
