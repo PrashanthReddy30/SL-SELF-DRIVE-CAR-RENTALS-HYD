@@ -219,11 +219,13 @@ export default function AdminBookings() {
                         onChange={(e) => handleStatusChange(b.id, e.target.value)}
                         className={`text-sm font-bold rounded-lg px-2 py-1 outline-none border border-transparent hover:border-gray-300 focus:border-primary ${
                           b.status === 'Confirmed' ? 'text-green-700 bg-green-50' : 
+                          b.status === 'Trip Started' ? 'text-purple-700 bg-purple-50' :
                           b.status === 'Pending' ? 'text-yellow-700 bg-yellow-50' : 'text-red-700 bg-red-50'
                         }`}
                       >
                         <option value="Pending">Pending</option>
                         <option value="Confirmed">Confirmed</option>
+                        <option value="Trip Started">Trip Started</option>
                         <option value="Completed">Completed</option>
                         <option value="Cancelled">Cancelled</option>
                       </select>

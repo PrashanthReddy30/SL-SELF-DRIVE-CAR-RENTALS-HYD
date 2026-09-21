@@ -31,7 +31,7 @@ export interface Car {
   imageUrl: string;
 }
 
-export type BookingStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+export type BookingStatus = 'Pending' | 'Confirmed' | 'Trip Started' | 'Completed' | 'Cancelled';
 
 export interface Booking {
   id: string;
