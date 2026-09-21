@@ -15,6 +15,7 @@ export default function AdminBookings() {
   const [completingBooking, setCompletingBooking] = useState<string | null>(null);
   const [extraDays, setExtraDays] = useState<number | ''>(0);
   const [extraHours, setExtraHours] = useState<number | ''>(0);
+  const [overrideTotal, setOverrideTotal] = useState<number | ''>('');
 
   // Confirmation Modal State
   const [confirmingBooking, setConfirmingBooking] = useState<string | null>(null);
@@ -110,6 +111,7 @@ export default function AdminBookings() {
       setCompletingBooking(bookingId);
       setExtraDays(0);
       setExtraHours(0);
+      setOverrideTotal('');
     } else if (newStatus === 'Confirmed') {
       setConfirmingBooking(bookingId);
       setSelectedRegNumber('');
@@ -130,7 +132,8 @@ export default function AdminBookings() {
     const perDayRate = targetCar.pricePerDay;
     const hourlyRate = Math.round(perDayRate / 24);
     const extraCost = (days * perDayRate) + (hours * hourlyRate);
-    const newTotal = targetBooking.totalPrice + extraCost;
+    const calculatedTotal = targetBooking.totalPrice + extraCost;
+    const newTotal = overrideTotal !== '' ? Number(overrideTotal) : calculatedTotal;
 
     completeBooking(completingBooking, days, hours, newTotal, targetCar.name, targetBooking.carNumber || targetCar.carNumber);
     
@@ -144,6 +147,7 @@ export default function AdminBookings() {
   const hourlyRate = Math.round(perDayRate / 24);
   const currentExtraCost = (Number(extraDays || 0) * perDayRate) + (Number(extraHours || 0) * hourlyRate);
   const calculatedTotal = (targetBooking?.totalPrice || 0) + currentExtraCost;
+  const displayTotal = overrideTotal !== '' ? Number(overrideTotal) : calculatedTotal;
 
   // Variables for confirmation modal
   const targetConfirmBooking = bookings.find(b => b.id === confirmingBooking);
@@ -284,6 +288,18 @@ export default function AdminBookings() {
                   className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Final Amount Override (Optional)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  placeholder={`₹${calculatedTotal.toLocaleString()}`}
+                  value={overrideTotal} 
+                  onChange={(e) => setOverrideTotal(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">Leave blank to use the automatically calculated total.</p>
+              </div>
             </div>
 
             <div className="bg-slate-50 p-4 rounded-xl border border-gray-100 mb-8 space-y-2">
@@ -292,8 +308,8 @@ export default function AdminBookings() {
                 <span>₹{targetBooking.totalPrice.toLocaleString()}</span>
               </div>
               <div className="pt-2 border-t border-gray-200 flex justify-between font-bold text-secondary text-lg">
-                <span>New Total:</span>
-                <span>₹{calculatedTotal.toLocaleString()}</span>
+                <span>Final Total to Save:</span>
+                <span>₹{displayTotal.toLocaleString()}</span>
               </div>
             </div>
 
