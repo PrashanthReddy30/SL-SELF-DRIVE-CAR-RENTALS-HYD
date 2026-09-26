@@ -340,24 +340,27 @@ export default function AdminBookings() {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Assign Registration Number</span>
-                {targetConfirmCar.carNumbers && targetConfirmCar.carNumbers.length > 0 ? (
-                  <select 
-                    value={selectedRegNumber} 
-                    onChange={e => setSelectedRegNumber(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 outline-none mt-1"
-                  >
-                    <option value="">-- Select a Registration Number --</option>
-                    {targetConfirmCar.carNumbers.map((cn, idx) => {
-                      const num = typeof cn === 'string' ? cn : cn.number;
-                      const owner = typeof cn === 'string' ? '' : cn.owner;
-                      return (
-                        <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>
-                      );
-                    })}
-                  </select>
-                ) : (
-                  <span className="font-semibold text-secondary">{targetConfirmCar.carNumber || 'N/A'}</span>
-                )}
+                {(() => {
+                  const nums = targetConfirmCar.carNumbers?.length ? targetConfirmCar.carNumbers : (targetConfirmCar.carNumber ? [{number: targetConfirmCar.carNumber, owner: '', ownerPhone: ''}] : []);
+                  return nums.length > 0 ? (
+                    <select 
+                      value={selectedRegNumber} 
+                      onChange={e => setSelectedRegNumber(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 outline-none mt-1"
+                    >
+                      <option value="">-- Select a Registration Number --</option>
+                      {nums.map((cn, idx) => {
+                        const num = typeof cn === 'string' ? cn : cn.number;
+                        const owner = typeof cn === 'string' ? '' : cn.owner;
+                        return (
+                          <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>
+                        );
+                      })}
+                    </select>
+                  ) : (
+                    <span className="font-semibold text-secondary">N/A</span>
+                  );
+                })()}
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Customer Details</span>
@@ -368,11 +371,37 @@ export default function AdminBookings() {
 
             <button 
               onClick={() => {
-                if (targetConfirmCar?.carNumbers?.length && !selectedRegNumber) {
+                const nums = targetConfirmCar?.carNumbers?.length ? targetConfirmCar.carNumbers : (targetConfirmCar?.carNumber ? [{number: targetConfirmCar.carNumber, owner: '', ownerPhone: ''}] : []);
+                if (nums.length > 0 && !selectedRegNumber) {
                   alert('Please select a registration number to assign');
                   return;
                 }
-                updateBookingStatus(confirmingBooking, 'Confirmed', selectedRegNumber || targetConfirmCar.carNumber);
+                const assignedReg = selectedRegNumber || targetConfirmCar?.carNumber;
+                
+                // --- WhatsApp Trigger ---
+                if (targetConfirmBooking) {
+                  const customerMsg = `Hello ${targetConfirmBooking.customerName}, your booking for ${targetConfirmCar?.name} (${assignedReg}) starting on ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} is Confirmed!`;
+                  
+                  let ownerMsg = '';
+                  let ownerPhone = '';
+                  if (assignedReg) {
+                    const regObj = nums.find(n => (typeof n === 'string' ? n : n.number) === assignedReg);
+                    if (regObj && typeof regObj !== 'string' && regObj.ownerPhone) {
+                      ownerPhone = regObj.ownerPhone;
+                      ownerMsg = `Hello ${regObj.owner}, your car ${targetConfirmCar?.name} (${assignedReg}) has a confirmed booking from ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} to ${new Date(targetConfirmBooking.endDate).toLocaleDateString()}.`;
+                    }
+                  }
+
+                  if (targetConfirmBooking.customerPhone) {
+                    window.open(`https://wa.me/${targetConfirmBooking.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(customerMsg)}`, '_blank');
+                  }
+                  if (ownerPhone) {
+                    window.open(`https://wa.me/${ownerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(ownerMsg)}`, '_blank');
+                  }
+                }
+                // ------------------------
+
+                updateBookingStatus(confirmingBooking, 'Confirmed', assignedReg);
                 setConfirmingBooking(null);
                 setSelectedRegNumber('');
               }}
@@ -421,11 +450,15 @@ export default function AdminBookings() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Select Registration (Optional)</label>
                   <select value={walkInCarNumber} onChange={e => setWalkInCarNumber(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
                     <option value="">-- Choose Registration --</option>
-                    {walkInCarId && cars.find(c => c.id === walkInCarId)?.carNumbers?.map((cn, idx) => {
-                      const num = typeof cn === 'string' ? cn : cn.number;
-                      const owner = typeof cn === 'string' ? '' : cn.owner;
-                      return <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>;
-                    })}
+                    {walkInCarId && (() => {
+                      const selectedCar = cars.find(c => c.id === walkInCarId);
+                      const nums = selectedCar?.carNumbers?.length ? selectedCar.carNumbers : (selectedCar?.carNumber ? [{number: selectedCar.carNumber, owner: ''}] : []);
+                      return nums.map((cn, idx) => {
+                        const num = typeof cn === 'string' ? cn : cn.number;
+                        const owner = typeof cn === 'string' ? '' : cn.owner;
+                        return <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>;
+                      });
+                    })()}
                   </select>
                 </div>
                 <div>

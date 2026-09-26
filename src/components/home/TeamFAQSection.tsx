@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Phone, CalendarDays } from 'lucide-react';
+import { User, Phone, CalendarDays, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { useInquiryStore } from '../../store/inquiryStore';
 
 export default function TeamFAQSection() {
@@ -12,6 +12,20 @@ export default function TeamFAQSection() {
     preferredDate: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const faqs = [
+    { q: "What documents are required to rent a car?", a: "You need a valid original Driving License (DL) and an Aadhaar Card. We will keep a copy for our records." },
+    { q: "Is there a security deposit?", a: "Yes, a refundable security deposit is required before the trip starts. The amount depends on the car model." },
+    { q: "What is the daily mileage limit?", a: "Most of our cars come with a generous daily limit (e.g., 250-300 km/day). Extra kilometers are charged nominally per km." },
+    { q: "Do I need to pay for fuel?", a: "Cars are delivered with a specific fuel level. You must return it with the same level, or you will be charged for the difference." }
+  ];
+
+  const testimonials = [
+    { name: "Rahul S.", text: "Excellent condition cars and very professional service. Highly recommend SL Car Rentals for weekend trips!", rating: 5 },
+    { name: "Priya M.", text: "The booking process was so smooth and the owner was very cooperative. The car was clean and well maintained.", rating: 5 },
+    { name: "Karthik Reddy", text: "Best self-drive cars in Nagaram. Transparent pricing and no hidden charges. Loved the experience.", rating: 5 }
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,6 +125,51 @@ export default function TeamFAQSection() {
               )}
             </div>
           </form>
+        </div>
+
+        {/* Testimonials Section */}
+        <div className="mt-24 mb-16">
+          <div className="text-center mb-10">
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Reviews</span>
+            <h2 className="text-3xl font-bold text-secondary">What Our Customers Say</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((t, i) => (
+              <div key={i} className="bg-slate-50 rounded-2xl p-8 border border-gray-100">
+                <div className="flex gap-1 mb-4 text-yellow-400">
+                  {[...Array(t.rating)].map((_, j) => <Star key={j} size={18} fill="currentColor" />)}
+                </div>
+                <p className="text-gray-600 mb-6 italic">"{t.text}"</p>
+                <div className="font-bold text-secondary">- {t.name}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-24 max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Support</span>
+            <h2 className="text-3xl font-bold text-secondary">Frequently Asked Questions</h2>
+          </div>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <div key={i} className="border border-gray-100 rounded-2xl bg-slate-50 overflow-hidden">
+                <button 
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full px-6 py-4 text-left flex justify-between items-center font-bold text-secondary hover:bg-slate-100 transition-colors"
+                >
+                  {faq.q}
+                  {openFaq === i ? <ChevronUp size={20} className="text-primary" /> : <ChevronDown size={20} className="text-gray-400" />}
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-4 text-gray-600 leading-relaxed">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
       </section>

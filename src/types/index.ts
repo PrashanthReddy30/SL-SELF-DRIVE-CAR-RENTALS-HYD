@@ -17,6 +17,7 @@ export type FuelType = 'Petrol' | 'Diesel' | 'Electric' | 'Hybrid';
 export interface CarRegistration {
   number: string;
   owner: string;
+  ownerPhone?: string;
 }
 
 export interface Car {
@@ -29,6 +30,7 @@ export interface Car {
   fuelType: FuelType;
   pricePerDay: number;
   imageUrl: string;
+  seats?: number;
 }
 
 export type BookingStatus = 'Pending' | 'Confirmed' | 'Trip Started' | 'Completed' | 'Cancelled';

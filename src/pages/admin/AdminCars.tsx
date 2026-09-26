@@ -13,9 +13,11 @@ export default function AdminCars() {
   // Form State
   const [name, setName] = useState('');
   const [ownerName, setOwnerName] = useState('');
+  const [ownerPhone, setOwnerPhone] = useState('');
   const [carNumbers, setCarNumbers] = useState<CarRegistration[]>([]);
   const [currentNumberInput, setCurrentNumberInput] = useState('');
   const [category, setCategory] = useState<CarCategory>('Sedan');
+  const [seats, setSeats] = useState<number | ''>('');
   const [transmission, setTransmission] = useState<Transmission>('Automatic');
   const [fuelType, setFuelType] = useState<FuelType>('Petrol');
   const [price, setPrice] = useState('');
@@ -27,9 +29,11 @@ export default function AdminCars() {
     setEditingCar(null);
     setName('');
     setOwnerName('');
+    setOwnerPhone('');
     setCarNumbers([]);
     setCurrentNumberInput('');
     setCategory('Sedan');
+    setSeats('');
     setTransmission('Automatic');
     setFuelType('Petrol');
     setPrice('');
@@ -47,19 +51,20 @@ export default function AdminCars() {
     if (car.carNumbers) {
       car.carNumbers.forEach(cn => {
         if (typeof cn === 'string') {
-          initialNumbers.push({ number: cn, owner: '' });
+          initialNumbers.push({ number: cn, owner: '', ownerPhone: '' });
         } else {
           initialNumbers.push(cn);
         }
       });
     }
     if (car.carNumber && !initialNumbers.some(cn => cn.number === car.carNumber)) {
-      initialNumbers.push({ number: car.carNumber, owner: '' });
+      initialNumbers.push({ number: car.carNumber, owner: '', ownerPhone: '' });
     }
     setCarNumbers(initialNumbers);
     setCurrentNumberInput('');
     
     setCategory(car.category);
+    setSeats(car.seats || '');
     setTransmission(car.transmission);
     setFuelType(car.fuelType || 'Petrol');
     setPrice(car.pricePerDay.toString());
@@ -87,18 +92,21 @@ export default function AdminCars() {
 
       const finalCarNumbers = [...carNumbers];
       if (currentNumberInput.trim() && !finalCarNumbers.some(cn => cn.number === currentNumberInput.trim())) {
-        finalCarNumbers.push({ number: currentNumberInput.trim(), owner: ownerName.trim() });
+        finalCarNumbers.push({ number: currentNumberInput.trim(), owner: ownerName.trim(), ownerPhone: ownerPhone.trim() });
       }
 
       if (editingCar) {
         updateCar(editingCar.id, {
           name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
+          seats: seats ? Number(seats) : undefined,
           imageUrl: finalImageUrl || editingCar.imageUrl
         });
       } else {
         addCar({
           id: Date.now().toString(),
-          name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), imageUrl: finalImageUrl
+          name, carNumbers: finalCarNumbers, category, transmission, fuelType, pricePerDay: Number(price), 
+          seats: seats ? Number(seats) : undefined,
+          imageUrl: finalImageUrl
         });
       }
       setIsModalOpen(false);
@@ -112,9 +120,10 @@ export default function AdminCars() {
 
   const handleAddNumber = () => {
     if (currentNumberInput.trim() && !carNumbers.some(cn => cn.number === currentNumberInput.trim())) {
-      setCarNumbers([...carNumbers, { number: currentNumberInput.trim(), owner: ownerName.trim() }]);
+      setCarNumbers([...carNumbers, { number: currentNumberInput.trim(), owner: ownerName.trim(), ownerPhone: ownerPhone.trim() }]);
       setCurrentNumberInput('');
       setOwnerName('');
+      setOwnerPhone('');
     }
   };
 
@@ -136,7 +145,7 @@ export default function AdminCars() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
               <tr className="bg-slate-50 border-b border-gray-200">
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">IMAGE</th>
@@ -219,6 +228,14 @@ export default function AdminCars() {
                       className="flex-1 min-w-[120px] border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
                       placeholder="Owner (e.g. Ramesh)" 
                     />
+                    <input 
+                      type="text" 
+                      value={ownerPhone} 
+                      onChange={e => setOwnerPhone(e.target.value)} 
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddNumber(); } }}
+                      className="flex-1 min-w-[120px] border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" 
+                      placeholder="WhatsApp No" 
+                    />
                     <button type="button" onClick={handleAddNumber} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-colors">Add</button>
                   </div>
                   {carNumbers.length > 0 && (
@@ -226,9 +243,10 @@ export default function AdminCars() {
                       {carNumbers.map((cn, idx) => {
                         const num = typeof cn === 'string' ? cn : cn.number;
                         const own = typeof cn === 'string' ? '' : cn.owner;
+                        const phone = typeof cn === 'string' ? '' : cn.ownerPhone;
                         return (
                           <li key={idx} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                            <span className="text-sm font-semibold text-gray-700">{idx + 1}. {num} {own ? `(${own})` : ''}</span>
+                            <span className="text-sm font-semibold text-gray-700">{idx + 1}. {num} {own ? `(${own}${phone ? `, ${phone}` : ''})` : ''}</span>
                             <button type="button" onClick={() => handleRemoveNumber(idx)} className="text-red-400 hover:text-red-600"><X size={16} /></button>
                           </li>
                         );
@@ -263,6 +281,10 @@ export default function AdminCars() {
                     <option value="Electric">Electric</option>
                     <option value="Hybrid">Hybrid</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Seats (Optional)</label>
+                  <input type="number" value={seats} onChange={e => setSeats(e.target.value === '' ? '' : Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none" placeholder="e.g. 5" />
                 </div>
               </div>
 

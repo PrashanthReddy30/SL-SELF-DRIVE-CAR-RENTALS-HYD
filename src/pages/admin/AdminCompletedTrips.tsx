@@ -9,20 +9,39 @@ export default function AdminCompletedTrips() {
   const { cars } = useFleetStore();
   const [filterStartDate, setFilterStartDate] = useState('');
   const [filterEndDate, setFilterEndDate] = useState('');
+  const [filterOwner, setFilterOwner] = useState('');
+  const [commissionPct, setCommissionPct] = useState<number>(30); // Admin commission percentage
+
+  const uniqueOwners = Array.from(new Set(cars.flatMap(c => 
+    c.carNumbers?.map(cn => typeof cn === 'string' ? '' : cn.owner).filter(Boolean) || []
+  )));
 
   const completedTrips = bookings.filter(b => b.status === 'Completed');
 
   const filteredTrips = completedTrips.filter(b => {
-    if (!filterStartDate && !filterEndDate) return true;
-    
+    // Date filter
     const tripDate = new Date(b.endDate).getTime();
-    const start = filterStartDate ? new Date(filterStartDate).getTime() : 0;
-    
-    // If end date is selected, set it to the end of that day (23:59:59) to include all trips on that day
-    const end = filterEndDate ? new Date(filterEndDate).getTime() + (24 * 60 * 60 * 1000) - 1 : Infinity;
+    if (filterStartDate && tripDate < new Date(filterStartDate).getTime()) return false;
+    if (filterEndDate && tripDate > new Date(filterEndDate).getTime() + 86399999) return false;
 
-    return tripDate >= start && tripDate <= end;
+    // Owner filter
+    if (filterOwner) {
+      const car = cars.find(c => c.id === b.carId);
+      const carNumber = b.carNumber || car?.carNumber;
+      let ownerName = '';
+      if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
+        const regObj = (car.carNumbers as any[]).find(cn => cn.number === carNumber);
+        if (regObj) ownerName = regObj.owner;
+      }
+      if (ownerName.toLowerCase() !== filterOwner.toLowerCase()) return false;
+    }
+
+    return true;
   });
+
+  const totalRevenue = filteredTrips.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+  const adminCommission = (totalRevenue * commissionPct) / 100;
+  const ownerPayout = totalRevenue - adminCommission;
 
   const handleDownloadReport = () => {
     if (filteredTrips.length === 0) {
@@ -73,7 +92,20 @@ export default function AdminCompletedTrips() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-secondary">Completed Trips Log</h1>
         
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto flex-wrap justify-end">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-500">Owner</span>
+            <select 
+              value={filterOwner} 
+              onChange={(e) => setFilterOwner(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary bg-white"
+            >
+              <option value="">All Owners</option>
+              {uniqueOwners.map(owner => (
+                <option key={owner} value={owner}>{owner}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-500">From</span>
             <input 
@@ -99,6 +131,35 @@ export default function AdminCompletedTrips() {
             <FileSpreadsheet size={18} />
             Export CSV
           </button>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+          <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Completed Trips</span>
+          <span className="text-3xl font-bold text-secondary">{filteredTrips.length}</span>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-green-100 flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10 text-green-600"><FileSpreadsheet size={48} /></div>
+          <span className="text-sm font-semibold text-green-700 uppercase tracking-wider mb-2">Total Revenue</span>
+          <span className="text-3xl font-bold text-green-600">₹{totalRevenue.toLocaleString()}</span>
+        </div>
+        <div className="bg-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100 flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10 text-blue-600"><User size={48} /></div>
+          <div className="flex justify-between items-center mb-2 relative z-10">
+            <span className="text-sm font-semibold text-blue-800 uppercase tracking-wider">Owner Payout</span>
+            <div className="flex items-center gap-2 bg-white/50 px-2 py-1 rounded-md">
+              <span className="text-xs text-blue-800 font-medium">Admin Comm %</span>
+              <input 
+                type="number" 
+                value={commissionPct} 
+                onChange={(e) => setCommissionPct(Number(e.target.value))}
+                className="w-14 border border-blue-200 rounded px-1 py-0.5 text-xs outline-none bg-white text-blue-900" 
+              />
+            </div>
+          </div>
+          <span className="text-3xl font-bold text-blue-700 relative z-10">₹{ownerPayout.toLocaleString()}</span>
         </div>
       </div>
 

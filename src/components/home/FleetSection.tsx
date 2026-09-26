@@ -71,10 +71,16 @@ export default function FleetSection() {
 
               <div className="mt-auto">
                 <h3 className="text-xl font-bold text-secondary mb-1">{car.name}</h3>
-                <div className="flex gap-3 text-sm text-gray-500 font-medium mb-6">
-                  <span>{car.transmission}</span>
-                  <span>•</span>
-                  <span>{car.fuelType}</span>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md text-xs font-semibold">
+                    {car.transmission}
+                  </span>
+                  <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-xs font-semibold">
+                    {car.fuelType}
+                  </span>
+                  <span className="bg-orange-50 text-orange-700 px-2.5 py-1 rounded-md text-xs font-semibold">
+                    {car.seats || (car.category === 'SUV' || car.category === 'MUV' ? 7 : 5)} Seats
+                  </span>
                 </div>
                 
                 <div className="flex items-center justify-between border-t border-gray-100 pt-6">

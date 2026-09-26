@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import { useAuthStore } from '../../store/authStore';
@@ -8,6 +8,16 @@ import { Toaster } from 'react-hot-toast';
 export default function AdminLayout() {
   const { user, isAuthenticated } = useAuthStore();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const meta = document.createElement('meta');
+    meta.name = 'robots';
+    meta.content = 'noindex, nofollow';
+    document.head.appendChild(meta);
+    return () => {
+      document.head.removeChild(meta);
+    };
+  }, []);
 
   if (!isAuthenticated || user?.role !== 'admin') {
     return <Navigate to="/admin/login" replace />;
