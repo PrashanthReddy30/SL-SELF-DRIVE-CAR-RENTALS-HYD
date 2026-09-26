@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import type { Booking } from '../types';
 import { playAlertSound } from '../utils/playAlertSound';
 import toast from 'react-hot-toast';
@@ -8,6 +8,7 @@ import { useFleetStore } from './fleetStore';
 
 interface BookingState {
   bookings: Booking[];
+  completedBookings: Booking[];
   isInitialized: boolean;
   initialize: () => void;
   addBooking: (booking: Booking) => Promise<void>;
@@ -19,6 +20,7 @@ interface BookingState {
 
 export const useBookingStore = create<BookingState>((set, get) => ({
   bookings: [],
+  completedBookings: [],
   isInitialized: false,
 
   initialize: () => {
@@ -26,6 +28,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     
     let isInitialLoad = true;
     
+    // Listen to active bookings
     onSnapshot(collection(db, 'bookings'), (snapshot: any) => {
       if (!isInitialLoad) {
         snapshot.docChanges().forEach((change: any) => {
@@ -55,10 +58,17 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       isInitialLoad = false;
 
       const bookingsData = snapshot.docs.map((doc: any) => doc.data() as Booking);
-      // Sort by createdAt descending
       bookingsData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       set({ bookings: bookingsData });
+    });
+
+    // Listen to completed bookings separately
+    onSnapshot(collection(db, 'completed_bookings'), (snapshot: any) => {
+      const completedData = snapshot.docs.map((doc: any) => doc.data() as Booking);
+      completedData.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
+      
+      set({ completedBookings: completedData });
     });
 
     set({ isInitialized: true });
@@ -77,15 +87,29 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   },
 
   completeBooking: async (id, extraDays, extraHours, newTotal, carName, carNumber) => {
-    const updateData: any = { 
+    // 1. Fetch the existing booking
+    const oldDocRef = doc(db, 'bookings', id);
+    const docSnap = await getDoc(oldDocRef);
+    if (!docSnap.exists()) return;
+    
+    const bookingData = docSnap.data();
+
+    // 2. Prepare the updated completed data
+    const completedData = {
+      ...bookingData,
       status: 'Completed',
       extraDays,
       extraHours,
       totalPrice: newTotal
     };
-    if (carName) updateData.carName = carName;
-    if (carNumber) updateData.carNumber = carNumber;
-    await updateDoc(doc(db, 'bookings', id), updateData);
+    if (carName) completedData.carName = carName;
+    if (carNumber) completedData.carNumber = carNumber;
+
+    // 3. Write it to completed_bookings collection
+    await setDoc(doc(db, 'completed_bookings', id), completedData);
+
+    // 4. Delete it from active bookings collection
+    await deleteDoc(oldDocRef);
   },
 
   updateAdminNote: async (id, adminNote) => {

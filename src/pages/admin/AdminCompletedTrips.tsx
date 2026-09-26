@@ -5,7 +5,7 @@ import { generateInvoice } from '../../utils/generateInvoice';
 import { useState } from 'react';
 
 export default function AdminCompletedTrips() {
-  const { bookings } = useBookingStore();
+  const { completedBookings } = useBookingStore();
   const { cars } = useFleetStore();
   const [filterStartDate, setFilterStartDate] = useState('');
   const [filterEndDate, setFilterEndDate] = useState('');
@@ -16,7 +16,7 @@ export default function AdminCompletedTrips() {
     c.carNumbers?.map(cn => typeof cn === 'string' ? '' : cn.owner).filter(Boolean) || []
   )));
 
-  const completedTrips = bookings.filter(b => b.status === 'Completed');
+  const completedTrips = completedBookings;
 
   const filteredTrips = completedTrips.filter(b => {
     // Date filter

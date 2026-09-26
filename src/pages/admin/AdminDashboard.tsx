@@ -4,16 +4,15 @@ import { Car, CalendarDays, CheckCircle2, TrendingUp } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { cars } = useFleetStore();
-  const { bookings } = useBookingStore();
+  const { bookings, completedBookings } = useBookingStore();
 
   const activeBookings = bookings.filter(b => b.status === 'Confirmed' || b.status === 'Pending').length;
-  const completedTrips = bookings.filter(b => b.status === 'Completed');
-  const totalRevenue = completedTrips.reduce((acc, curr) => acc + curr.totalPrice, 0);
+  const totalRevenue = completedBookings.reduce((acc, curr) => acc + curr.totalPrice, 0);
 
   const stats = [
     { title: 'Total Fleet', value: cars.length, icon: Car, color: 'text-blue-500', bg: 'bg-blue-100' },
     { title: 'Active Bookings', value: activeBookings, icon: CalendarDays, color: 'text-orange-500', bg: 'bg-orange-100' },
-    { title: 'Completed Trips', value: completedTrips.length, icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-100' },
+    { title: 'Completed Trips', value: completedBookings.length, icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-100' },
     { title: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-100' },
   ];
 
