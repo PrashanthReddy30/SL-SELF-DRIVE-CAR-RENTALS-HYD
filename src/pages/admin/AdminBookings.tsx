@@ -378,9 +378,61 @@ export default function AdminBookings() {
                 }
                 const assignedReg = selectedRegNumber || targetConfirmCar?.carNumber;
                 
-                // --- WhatsApp Trigger ---
-                // WhatsApp messaging is now handled securely in the background 
-                // by the Firebase Cloud Function "onBookingStatusChange" via Twilio API.
+                // --- Twilio WhatsApp API Trigger (Client-Side) ---
+                if (targetConfirmBooking) {
+                  const customerMsg = `Hello ${targetConfirmBooking.customerName}, your booking for ${targetConfirmCar?.name} (${assignedReg}) starting on ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} is Confirmed!`;
+                  
+                  let ownerMsg = '';
+                  let ownerPhone = '';
+                  if (assignedReg) {
+                    const regObj = nums.find(n => (typeof n === 'string' ? n : n.number) === assignedReg);
+                    if (regObj && typeof regObj !== 'string' && regObj.ownerPhone) {
+                      ownerPhone = regObj.ownerPhone;
+                      ownerMsg = `Hello ${regObj.owner}, your car ${targetConfirmCar?.name} (${assignedReg}) has a confirmed booking from ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} to ${new Date(targetConfirmBooking.endDate).toLocaleDateString()}.`;
+                    }
+                  }
+
+                  const sendTwilioMessage = async (msg: string, phone: string) => {
+                    const accountSid = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
+                    const authToken = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
+                    const twilioNumber = import.meta.env.VITE_TWILIO_WHATSAPP_NUMBER;
+                    
+                    if (!accountSid || !authToken) {
+                      console.error("Twilio credentials not found in environment variables.");
+                      return;
+                    }
+
+                    let formattedPhone = phone.replace(/\D/g, '');
+                    if (!formattedPhone.startsWith('91')) formattedPhone = '91' + formattedPhone;
+
+                    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+                    const formData = new URLSearchParams();
+                    formData.append('To', `whatsapp:+${formattedPhone}`);
+                    formData.append('From', twilioNumber || 'whatsapp:+14155238886');
+                    formData.append('Body', msg);
+
+                    try {
+                      await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+                          'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData
+                      });
+                      console.log("WhatsApp message sent securely in background to:", formattedPhone);
+                    } catch (error) {
+                      console.error("Failed to send background WhatsApp message:", error);
+                    }
+                  };
+
+                  if (targetConfirmBooking.customerPhone) {
+                    sendTwilioMessage(customerMsg, targetConfirmBooking.customerPhone);
+                  }
+                  if (ownerPhone) {
+                    sendTwilioMessage(ownerMsg, ownerPhone);
+                  }
+                }
                 // ------------------------
 
                 updateBookingStatus(confirmingBooking, 'Confirmed', assignedReg);
