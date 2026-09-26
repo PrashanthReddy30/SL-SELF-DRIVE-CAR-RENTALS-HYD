@@ -378,7 +378,7 @@ export default function AdminBookings() {
                 }
                 const assignedReg = selectedRegNumber || targetConfirmCar?.carNumber;
                 
-                // --- Twilio WhatsApp API Trigger (Client-Side) ---
+                // --- Netlify Serverless Backend Trigger ---
                 if (targetConfirmBooking) {
                   const customerMsg = `Hello ${targetConfirmBooking.customerName}, your booking for ${targetConfirmCar?.name} (${assignedReg}) starting on ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} is Confirmed!`;
                   
@@ -393,36 +393,30 @@ export default function AdminBookings() {
                   }
 
                   const sendTwilioMessage = async (msg: string, phone: string) => {
-                    const accountSid = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
-                    const authToken = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
-                    const twilioNumber = import.meta.env.VITE_TWILIO_WHATSAPP_NUMBER;
-                    
-                    if (!accountSid || !authToken) {
-                      console.error("Twilio credentials not found in environment variables.");
-                      return;
-                    }
-
                     let formattedPhone = phone.replace(/\D/g, '');
                     if (!formattedPhone.startsWith('91')) formattedPhone = '91' + formattedPhone;
 
-                    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-                    const formData = new URLSearchParams();
-                    formData.append('To', `whatsapp:+${formattedPhone}`);
-                    formData.append('From', twilioNumber || 'whatsapp:+14155238886');
-                    formData.append('Body', msg);
-
                     try {
-                      await fetch(url, {
+                      // Call the local/deployed Netlify Function instead of Twilio directly to avoid CORS
+                      const response = await fetch('/.netlify/functions/send-whatsapp', {
                         method: 'POST',
                         headers: {
-                          'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-                          'Content-Type': 'application/x-www-form-urlencoded'
+                          'Content-Type': 'application/json'
                         },
-                        body: formData
+                        body: JSON.stringify({
+                          phone: formattedPhone,
+                          msg: msg
+                        })
                       });
-                      console.log("WhatsApp message sent securely in background to:", formattedPhone);
+                      
+                      const result = await response.json();
+                      if (response.ok) {
+                        console.log("WhatsApp message sent securely via Netlify backend to:", formattedPhone);
+                      } else {
+                        console.error("Netlify Backend Error:", result);
+                      }
                     } catch (error) {
-                      console.error("Failed to send background WhatsApp message:", error);
+                      console.error("Failed to call Netlify backend:", error);
                     }
                   };
 
