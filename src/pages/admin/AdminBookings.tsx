@@ -378,56 +378,7 @@ export default function AdminBookings() {
                 }
                 const assignedReg = selectedRegNumber || targetConfirmCar?.carNumber;
                 
-                // --- Netlify Serverless Backend Trigger ---
-                if (targetConfirmBooking) {
-                  const customerMsg = `Hello ${targetConfirmBooking.customerName}, your booking for ${targetConfirmCar?.name} (${assignedReg}) starting on ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} is Confirmed!`;
-                  
-                  let ownerMsg = '';
-                  let ownerPhone = '';
-                  if (assignedReg) {
-                    const regObj = nums.find(n => (typeof n === 'string' ? n : n.number) === assignedReg);
-                    if (regObj && typeof regObj !== 'string' && regObj.ownerPhone) {
-                      ownerPhone = regObj.ownerPhone;
-                      ownerMsg = `Hello ${regObj.owner}, your car ${targetConfirmCar?.name} (${assignedReg}) has a confirmed booking from ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} to ${new Date(targetConfirmBooking.endDate).toLocaleDateString()}.`;
-                    }
-                  }
 
-                  const sendTwilioMessage = async (msg: string, phone: string) => {
-                    let formattedPhone = phone.replace(/\D/g, '');
-                    if (!formattedPhone.startsWith('91')) formattedPhone = '91' + formattedPhone;
-
-                    try {
-                      // Call the local/deployed Netlify Function instead of Twilio directly to avoid CORS
-                      const response = await fetch('/.netlify/functions/send-whatsapp', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                          phone: formattedPhone,
-                          msg: msg
-                        })
-                      });
-                      
-                      const result = await response.json();
-                      if (response.ok) {
-                        console.log("WhatsApp message sent securely via Netlify backend to:", formattedPhone);
-                      } else {
-                        console.error("Netlify Backend Error:", result);
-                      }
-                    } catch (error) {
-                      console.error("Failed to call Netlify backend:", error);
-                    }
-                  };
-
-                  if (targetConfirmBooking.customerPhone) {
-                    sendTwilioMessage(customerMsg, targetConfirmBooking.customerPhone);
-                  }
-                  if (ownerPhone) {
-                    sendTwilioMessage(ownerMsg, ownerPhone);
-                  }
-                }
-                // ------------------------
 
                 updateBookingStatus(confirmingBooking, 'Confirmed', assignedReg);
                 setConfirmingBooking(null);
