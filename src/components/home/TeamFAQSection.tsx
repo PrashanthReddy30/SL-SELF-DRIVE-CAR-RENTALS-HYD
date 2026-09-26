@@ -17,7 +17,7 @@ export default function TeamFAQSection() {
   const faqs = [
     { q: "What documents are required to rent a car?", a: "You need a valid original Driving License (DL) and an Aadhaar Card. We will keep a copy for our records." },
     { q: "Is there a security deposit?", a: "Yes, a refundable security deposit is required before the trip starts. The amount depends on the car model." },
-    { q: "What is the daily mileage limit?", a: "Most of our cars come with a generous daily limit (e.g., 250-300 km/day). Extra kilometers are charged nominally per km." },
+    { q: "What is the daily mileage limit?", a: "Most of our cars come with a generous daily limit of 400 km/day. Extra kilometers are charged nominally per km." },
     { q: "Do I need to pay for fuel?", a: "Cars are delivered with a specific fuel level. You must return it with the same level, or you will be charged for the difference." }
   ];
 
