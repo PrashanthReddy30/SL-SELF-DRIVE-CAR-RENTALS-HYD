@@ -55,7 +55,7 @@ export default function AdminLogin() {
 
         {/* Login Card */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Admin Email</label>
               <input 
@@ -64,7 +64,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium transition-all" 
-                placeholder="admin@slcarrentals.in" 
+                autoComplete="off"
               />
             </div>
 
