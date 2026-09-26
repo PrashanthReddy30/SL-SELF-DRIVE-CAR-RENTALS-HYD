@@ -95,7 +95,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
     const bookingData = docSnap.data();
 
     // 2. Prepare the updated completed data
-    const completedData = {
+    const completedData: any = {
       ...bookingData,
       status: 'Completed',
       extraDays,
