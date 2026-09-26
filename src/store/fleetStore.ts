@@ -20,6 +20,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Diesel',
     pricePerDay: 4000,
+    seats: 4,
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDaRLRwb-m6Y7CP0DKmC2FSdetL8rLOgEGqA90-RLnvNsNECHP5tMYNwEZCD7pQpE&s&ec=121966392',
   },
   {
@@ -29,6 +30,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Diesel',
     pricePerDay: 4000,
+    seats: 7,
     imageUrl: '/innova%20crysta.png',
   },
   {
@@ -38,6 +40,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2800,
+    seats: 7,
     imageUrl: '/ertiga.jpg',
   },
   {
@@ -47,6 +50,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2400,
+    seats: 5,
     imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/141867/nexon-exterior-right-front-three-quarter-71.jpeg',
   },
   {
@@ -56,6 +60,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
+    seats: 5,
     imageUrl: '/maruti-suzuki-baleno.webp',
   },
   {
@@ -65,6 +70,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
+    seats: 5,
     imageUrl: '/Toyota%20Glanza.jpeg.avif',
     carNumbers: [
       { number: 'TS08JU1684', owner: 'Ramesh' },
@@ -78,6 +84,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 2000,
+    seats: 5,
     imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/130591/fronx-exterior-right-front-three-quarter-109.jpeg',
   },
   {
@@ -87,6 +94,7 @@ const initialCars: Car[] = [
     transmission: 'Manual',
     fuelType: 'Petrol',
     pricePerDay: 1800,
+    seats: 5,
     imageUrl: '/swift.jpg',
   }
 ];
