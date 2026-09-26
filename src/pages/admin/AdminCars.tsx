@@ -256,7 +256,7 @@ export default function AdminCars() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select value={category} onChange={e => setCategory(e.target.value as CarCategory)} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 outline-none bg-white">
