@@ -379,26 +379,8 @@ export default function AdminBookings() {
                 const assignedReg = selectedRegNumber || targetConfirmCar?.carNumber;
                 
                 // --- WhatsApp Trigger ---
-                if (targetConfirmBooking) {
-                  const customerMsg = `Hello ${targetConfirmBooking.customerName}, your booking for ${targetConfirmCar?.name} (${assignedReg}) starting on ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} is Confirmed!`;
-                  
-                  let ownerMsg = '';
-                  let ownerPhone = '';
-                  if (assignedReg) {
-                    const regObj = nums.find(n => (typeof n === 'string' ? n : n.number) === assignedReg);
-                    if (regObj && typeof regObj !== 'string' && regObj.ownerPhone) {
-                      ownerPhone = regObj.ownerPhone;
-                      ownerMsg = `Hello ${regObj.owner}, your car ${targetConfirmCar?.name} (${assignedReg}) has a confirmed booking from ${new Date(targetConfirmBooking.startDate).toLocaleDateString()} to ${new Date(targetConfirmBooking.endDate).toLocaleDateString()}.`;
-                    }
-                  }
-
-                  if (targetConfirmBooking.customerPhone) {
-                    window.open(`https://wa.me/${targetConfirmBooking.customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(customerMsg)}`, '_blank');
-                  }
-                  if (ownerPhone) {
-                    window.open(`https://wa.me/${ownerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(ownerMsg)}`, '_blank');
-                  }
-                }
+                // WhatsApp messaging is now handled securely in the background 
+                // by the Firebase Cloud Function "onBookingStatusChange" via Twilio API.
                 // ------------------------
 
                 updateBookingStatus(confirmingBooking, 'Confirmed', assignedReg);
