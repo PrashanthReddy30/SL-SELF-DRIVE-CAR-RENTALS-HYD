@@ -19,7 +19,7 @@ export default function AdminLogin() {
     e.preventDefault();
     
     // Demo login check
-    if (email.toLowerCase() === 'admin@slrentals.com') {
+    if ((email.toLowerCase() === 'admin@slrentals.com' || email.toLowerCase() === 'admin@slcarrentals.in') && password === 'Ramesh1994') {
       login({
         id: Date.now().toString(),
         name: 'Administrator',
@@ -36,7 +36,7 @@ export default function AdminLogin() {
 
       navigate('/admin');
     } else {
-      alert('Invalid admin credentials. For demo, use admin@slrentals.com');
+      alert('Invalid admin credentials.');
     }
   };
 
@@ -64,7 +64,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-medium transition-all" 
-                placeholder="admin@slrentals.com" 
+                placeholder="admin@slcarrentals.in" 
               />
             </div>
 
