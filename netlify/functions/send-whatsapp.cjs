@@ -19,7 +19,11 @@ exports.handler = async (event, context) => {
 
     const accountSid = process.env.VITE_TWILIO_ACCOUNT_SID || defaultSid;
     const authToken = process.env.VITE_TWILIO_AUTH_TOKEN || defaultToken;
-    const twilioNumber = process.env.VITE_TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+    let twilioNumber = process.env.VITE_TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+    
+    if (!twilioNumber.startsWith('whatsapp:')) {
+      twilioNumber = 'whatsapp:' + twilioNumber;
+    }
 
     const postData = new URLSearchParams();
     postData.append('To', `whatsapp:+${phone}`);
