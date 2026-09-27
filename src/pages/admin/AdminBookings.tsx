@@ -29,11 +29,25 @@ export default function AdminBookings() {
   const [walkInCarId, setWalkInCarId] = useState('');
   const [walkInCarNumber, setWalkInCarNumber] = useState('');
   const [walkInStartDate, setWalkInStartDate] = useState('');
+  const [walkInStartTime, setWalkInStartTime] = useState('10:00');
   const [walkInEndDate, setWalkInEndDate] = useState('');
+  const [walkInEndTime, setWalkInEndTime] = useState('10:00');
   const [walkInLocation, setWalkInLocation] = useState('Office');
   const [walkInPrice, setWalkInPrice] = useState<number | ''>('');
 
   const activeBookings = bookings.filter(b => b.status !== 'Completed' && b.status !== 'Cancelled');
+
+  // Generate 12-hour AM/PM time options
+  const timeOptions = Array.from({ length: 48 }).map((_, i) => {
+    const hour24 = Math.floor(i / 2);
+    const minute = i % 2 === 0 ? '00' : '30';
+    const ampm = hour24 >= 12 ? 'PM' : 'AM';
+    const hour12 = hour24 % 12 || 12;
+    return {
+      value: `${hour24.toString().padStart(2, '0')}:${minute}`,
+      label: `${hour12}:${minute} ${ampm}`
+    };
+  });
 
   // Open modal if query param is present
   useEffect(() => {
@@ -45,11 +59,11 @@ export default function AdminBookings() {
 
   // Auto-calculate walk-in price when dates or car changes
   useEffect(() => {
-    if (walkInCarId && walkInStartDate && walkInEndDate) {
+    if (walkInCarId && walkInStartDate && walkInStartTime && walkInEndDate && walkInEndTime) {
       const selectedCar = cars.find(c => c.id === walkInCarId);
       if (selectedCar) {
-        const start = new Date(walkInStartDate);
-        const end = new Date(walkInEndDate);
+        const start = new Date(`${walkInStartDate}T${walkInStartTime}`);
+        const end = new Date(`${walkInEndDate}T${walkInEndTime}`);
         if (end > start) {
           const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
           setWalkInPrice(days * selectedCar.pricePerDay);
@@ -58,11 +72,11 @@ export default function AdminBookings() {
         }
       }
     }
-  }, [walkInCarId, walkInStartDate, walkInEndDate, cars]);
+  }, [walkInCarId, walkInStartDate, walkInStartTime, walkInEndDate, walkInEndTime, cars]);
 
   const handleAddWalkInBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!walkInCarId || !walkInStartDate || !walkInEndDate || walkInPrice === '') return;
+    if (!walkInCarId || !walkInStartDate || !walkInStartTime || !walkInEndDate || !walkInEndTime || walkInPrice === '') return;
     
     const selectedCar = cars.find(c => c.id === walkInCarId);
     if (!selectedCar) return;
@@ -76,8 +90,8 @@ export default function AdminBookings() {
       customerName: walkInName,
       customerPhone: walkInPhone,
       aadharNumber: walkInAadhaar,
-      startDate: new Date(walkInStartDate).toISOString(),
-      endDate: new Date(walkInEndDate).toISOString(),
+      startDate: new Date(`${walkInStartDate}T${walkInStartTime}`).toISOString(),
+      endDate: new Date(`${walkInEndDate}T${walkInEndTime}`).toISOString(),
       pickupLocation: walkInLocation,
       totalPrice: Number(walkInPrice),
       status: 'Confirmed',
@@ -92,7 +106,9 @@ export default function AdminBookings() {
     setWalkInCarId('');
     setWalkInCarNumber('');
     setWalkInStartDate('');
+    setWalkInStartTime('10:00');
     setWalkInEndDate('');
+    setWalkInEndTime('10:00');
     setWalkInPrice('');
   };
 
@@ -450,11 +466,25 @@ export default function AdminBookings() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
-                  <input type="datetime-local" required value={walkInStartDate} onChange={e => setWalkInStartDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                  <div className="flex gap-2">
+                    <input type="date" required value={walkInStartDate} onChange={e => setWalkInStartDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                    <select required value={walkInStartTime} onChange={e => setWalkInStartTime(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 outline-none bg-white">
+                      {timeOptions.map(t => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
-                  <input type="datetime-local" required value={walkInEndDate} onChange={e => setWalkInEndDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                  <div className="flex gap-2">
+                    <input type="date" required value={walkInEndDate} onChange={e => setWalkInEndDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                    <select required value={walkInEndTime} onChange={e => setWalkInEndTime(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 outline-none bg-white">
+                      {timeOptions.map(t => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Pickup Location</label>
