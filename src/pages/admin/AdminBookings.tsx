@@ -2,10 +2,10 @@ import { useBookingStore } from '../../store/bookingStore';
 import { useFleetStore } from '../../store/fleetStore';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MessageSquare, Save, X } from 'lucide-react';
+import { MessageSquare, Save, X, Edit2 } from 'lucide-react';
 
 export default function AdminBookings() {
-  const { bookings, updateBookingStatus, updateAdminNote, completeBooking } = useBookingStore();
+  const { bookings, updateBookingStatus, updateAdminNote, completeBooking, updateBookingDetails } = useBookingStore();
   const { cars } = useFleetStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [editingNote, setEditingNote] = useState<string | null>(null);
@@ -34,6 +34,16 @@ export default function AdminBookings() {
   const [walkInEndTime, setWalkInEndTime] = useState('10:00');
   const [walkInLocation, setWalkInLocation] = useState('Office');
   const [walkInPrice, setWalkInPrice] = useState<number | ''>('');
+
+  // Edit Booking State
+  const [editingBookingObj, setEditingBookingObj] = useState<any>(null);
+  const [editStartDate, setEditStartDate] = useState('');
+  const [editStartTime, setEditStartTime] = useState('');
+  const [editEndDate, setEditEndDate] = useState('');
+  const [editEndTime, setEditEndTime] = useState('');
+  const [editPrice, setEditPrice] = useState<number | ''>('');
+  const [editCarId, setEditCarId] = useState('');
+  const [editCarNumber, setEditCarNumber] = useState('');
 
   const activeBookings = bookings.filter(b => b.status !== 'Completed' && b.status !== 'Cancelled');
 
@@ -112,6 +122,41 @@ export default function AdminBookings() {
     setWalkInPrice('');
   };
 
+  const openEditModal = (b: any) => {
+    setEditingBookingObj(b);
+    const start = new Date(b.startDate);
+    const end = new Date(b.endDate);
+    
+    const roundMinutes = (date: Date) => {
+      const d = new Date(date);
+      const m = d.getMinutes();
+      d.setMinutes(m >= 30 ? 30 : 0);
+      return d;
+    };
+    
+    setEditStartDate(start.toISOString().split('T')[0]);
+    setEditStartTime(roundMinutes(start).toTimeString().slice(0, 5));
+    setEditEndDate(end.toISOString().split('T')[0]);
+    setEditEndTime(roundMinutes(end).toTimeString().slice(0, 5));
+    setEditPrice(b.totalPrice);
+    setEditCarId(b.carId);
+    setEditCarNumber(b.carNumber || '');
+  };
+
+  const handleEditBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBookingObj || !editStartDate || !editStartTime || !editEndDate || !editEndTime || editPrice === '') return;
+
+    await updateBookingDetails(editingBookingObj.id, {
+      carId: editCarId,
+      carNumber: editCarNumber,
+      startDate: new Date(`${editStartDate}T${editStartTime}`).toISOString(),
+      endDate: new Date(`${editEndDate}T${editEndTime}`).toISOString(),
+      totalPrice: Number(editPrice)
+    });
+    setEditingBookingObj(null);
+  };
+
   const startEditingNote = (id: string, currentNote: string = '') => {
     setEditingNote(id);
     setNoteContent(currentNote);
@@ -188,7 +233,7 @@ export default function AdminBookings() {
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DURATION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TOTAL</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">STATUS</th>
-                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">ADMIN NOTES</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">NOTES & ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -266,10 +311,15 @@ export default function AdminBookings() {
                         </div>
                       ) : (
                         <div className="flex items-center justify-between group">
-                          <span className="text-sm text-gray-600 truncate max-w-[150px]">{b.adminNote || 'No notes'}</span>
-                          <button onClick={() => startEditingNote(b.id, b.adminNote)} className="text-gray-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MessageSquare size={16} />
-                          </button>
+                          <span className="text-sm text-gray-600 truncate max-w-[120px]">{b.adminNote || 'No notes'}</span>
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => openEditModal(b)} className="text-gray-400 hover:text-blue-600" title="Edit Booking">
+                              <Edit2 size={16} />
+                            </button>
+                            <button onClick={() => startEditingNote(b.id, b.adminNote)} className="text-gray-400 hover:text-primary" title="Edit Note">
+                              <MessageSquare size={16} />
+                            </button>
+                          </div>
                         </div>
                       )}
                     </td>
@@ -498,6 +548,77 @@ export default function AdminBookings() {
               </div>
               <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors mt-6">
                 Save Booking
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Booking Modal */}
+      {editingBookingObj && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setEditingBookingObj(null)}></div>
+          <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 animate-fade-in-up">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-secondary">Edit Booking</h2>
+              <button onClick={() => setEditingBookingObj(null)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+            </div>
+
+            <form onSubmit={handleEditBookingSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Car Model</label>
+                  <select required value={editCarId} onChange={e => { setEditCarId(e.target.value); setEditCarNumber(''); }} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
+                    <option value="">-- Choose a Car --</option>
+                    {cars.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} (₹{c.pricePerDay}/day)</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Registration</label>
+                  <select value={editCarNumber} onChange={e => setEditCarNumber(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none bg-white">
+                    <option value="">-- Any Registration --</option>
+                    {editCarId && (() => {
+                      const selectedCar = cars.find(c => c.id === editCarId);
+                      const nums = selectedCar?.carNumbers?.length ? selectedCar.carNumbers : (selectedCar?.carNumber ? [{number: selectedCar.carNumber, owner: ''}] : []);
+                      return nums.map((cn, idx) => {
+                        const num = typeof cn === 'string' ? cn : cn.number;
+                        const owner = typeof cn === 'string' ? '' : cn.owner;
+                        return <option key={idx} value={num}>{num} {owner ? `(${owner})` : ''}</option>;
+                      });
+                    })()}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                  <div className="flex gap-2">
+                    <input type="date" required value={editStartDate} onChange={e => setEditStartDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                    <select required value={editStartTime} onChange={e => setEditStartTime(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 outline-none bg-white">
+                      {timeOptions.map(t => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
+                  <div className="flex gap-2">
+                    <input type="date" required value={editEndDate} onChange={e => setEditEndDate(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none" />
+                    <select required value={editEndTime} onChange={e => setEditEndTime(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 outline-none bg-white">
+                      {timeOptions.map(t => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Total Price (₹)</label>
+                  <input type="number" required value={editPrice} onChange={e => setEditPrice(e.target.value === '' ? '' : Number(e.target.value))} className="w-full border border-gray-200 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+                </div>
+              </div>
+              <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors mt-6">
+                Save Changes
               </button>
             </form>
           </div>

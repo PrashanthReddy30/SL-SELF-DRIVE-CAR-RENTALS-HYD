@@ -15,6 +15,7 @@ interface BookingState {
   updateBookingStatus: (id: string, status: Booking['status'], assignedCarNumber?: string) => Promise<void>;
   completeBooking: (id: string, extraDays: number, extraHours: number, newTotal: number, carName?: string, carNumber?: string) => Promise<void>;
   updateAdminNote: (id: string, note: string) => Promise<void>;
+  updateBookingDetails: (id: string, updates: Partial<Booking>) => Promise<void>;
   cancelBooking: (id: string) => Promise<void>;
 }
 
@@ -114,6 +115,10 @@ export const useBookingStore = create<BookingState>((set, get) => ({
 
   updateAdminNote: async (id, adminNote) => {
     await updateDoc(doc(db, 'bookings', id), { adminNote });
+  },
+
+  updateBookingDetails: async (id, updates) => {
+    await updateDoc(doc(db, 'bookings', id), updates);
   },
 
   cancelBooking: async (id) => {
