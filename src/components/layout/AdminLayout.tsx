@@ -4,6 +4,7 @@ import AdminSidebar from './AdminSidebar';
 import { useAuthStore } from '../../store/authStore';
 import { Menu } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
+import AdminProfile from './AdminProfile';
 
 export default function AdminLayout() {
   const { user, isAuthenticated } = useAuthStore();
@@ -46,8 +47,14 @@ export default function AdminLayout() {
             </div>
             <span className="font-bold">Admin Portal</span>
           </div>
+          <AdminProfile />
         </header>
         
+        {/* Desktop Header */}
+        <div className="hidden md:flex justify-end items-center p-4 bg-slate-50 border-b border-gray-100">
+          <AdminProfile />
+        </div>
+
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
