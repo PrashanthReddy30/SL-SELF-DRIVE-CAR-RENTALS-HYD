@@ -169,6 +169,7 @@ export default function AdminBookings() {
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">VEHICLE NUMBER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">OWNER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DATES & LOCATION</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DURATION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TOTAL</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">STATUS</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">ADMIN NOTES</th>
@@ -177,7 +178,7 @@ export default function AdminBookings() {
             <tbody>
               {activeBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-gray-500">No active bookings found.</td>
+                  <td colSpan={9} className="py-8 text-center text-gray-500">No active bookings found.</td>
                 </tr>
               ) : (
                 activeBookings.map(b => (
@@ -210,6 +211,13 @@ export default function AdminBookings() {
                     <td className="py-4 px-6 text-sm">
                       <div className="text-gray-700">{new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}</div>
                       <div className="text-gray-500 text-xs mt-1">{b.pickupLocation}</div>
+                    </td>
+                    <td className="py-4 px-6 text-sm font-semibold text-gray-700">
+                      {(() => {
+                        const durationDiff = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
+                        const days = Math.max(1, Math.ceil(durationDiff / (1000 * 60 * 60 * 24)));
+                        return `${days} Day${days > 1 ? 's' : ''}`;
+                      })()}
                     </td>
                     <td className="py-4 px-6 font-bold text-secondary">₹{b.totalPrice}</td>
                     <td className="py-4 px-6">

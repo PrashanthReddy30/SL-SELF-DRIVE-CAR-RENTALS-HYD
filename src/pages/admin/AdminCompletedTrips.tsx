@@ -49,7 +49,7 @@ export default function AdminCompletedTrips() {
       return;
     }
 
-    const headers = ['Booking ID', 'Customer Name', 'Phone', 'Aadhaar', 'Vehicle', 'Start Date', 'End Date', 'Location', 'Total Revenue', 'Extra Days', 'Extra Hours'];
+    const headers = ['Booking ID', 'Customer Name', 'Phone', 'Aadhaar', 'Vehicle', 'Start Date', 'End Date', 'Duration (Days)', 'Location', 'Total Revenue', 'Extra Days', 'Extra Hours'];
     const csvData = filteredTrips.map(b => {
       const car = cars.find(c => c.id === b.carId);
       const carName = b.carName || car?.name || 'Unknown';
@@ -60,6 +60,9 @@ export default function AdminCompletedTrips() {
         if (regObj) ownerName = regObj.owner;
       }
       const carDisplayName = carNumber ? `${carName} - ${carNumber}${ownerName ? ` (${ownerName})` : ''}` : carName;
+      const durationDiff = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
+      const days = Math.max(1, Math.ceil(durationDiff / (1000 * 60 * 60 * 24)));
+
       return [
         b.id,
         `"${b.customerName}"`,
@@ -68,6 +71,7 @@ export default function AdminCompletedTrips() {
         `"${carDisplayName}"`,
         new Date(b.startDate).toLocaleDateString(),
         new Date(b.endDate).toLocaleDateString(),
+        days,
         `"${b.pickupLocation}"`,
         b.totalPrice,
         b.extraDays || 0,
@@ -173,6 +177,7 @@ export default function AdminCompletedTrips() {
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">VEHICLE NUMBER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">OWNER</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">TRIP DATES</th>
+                <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DURATION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">DESTINATION</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm">REVENUE</th>
                 <th className="py-4 px-6 font-semibold text-gray-600 text-sm text-right">INVOICE</th>
@@ -181,7 +186,7 @@ export default function AdminCompletedTrips() {
             <tbody>
               {filteredTrips.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-center text-gray-500">No completed trips found.</td>
+                  <td colSpan={9} className="py-8 text-center text-gray-500">No completed trips found.</td>
                 </tr>
               ) : (
                 filteredTrips.map(b => {
@@ -221,6 +226,13 @@ export default function AdminCompletedTrips() {
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-600">
                         {new Date(b.startDate).toLocaleDateString()} &rarr; {new Date(b.endDate).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-6 text-sm font-semibold text-gray-700">
+                        {(() => {
+                          const durationDiff = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
+                          const days = Math.max(1, Math.ceil(durationDiff / (1000 * 60 * 60 * 24)));
+                          return `${days} Day${days > 1 ? 's' : ''}`;
+                        })()}
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-600">{b.pickupLocation}</td>
                       <td className="py-4 px-6 font-bold text-green-600">₹{b.totalPrice.toLocaleString()}</td>
