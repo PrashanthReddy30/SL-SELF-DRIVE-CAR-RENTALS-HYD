@@ -1,9 +1,17 @@
-import { ArrowRight, ShieldCheck, FileText, AlertCircle, Fuel, XOctagon } from 'lucide-react';
+import { ArrowRight, ShieldCheck, FileText, AlertCircle, Fuel, XOctagon, HelpCircle, Car } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import SEO from '../components/common/SEO';
 
 export default function Terms() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 md:py-20">
+      <SEO
+        title="Rental Terms & Conditions | SL Self Drive Car Rentals Hyderabad"
+        description="Review the self-drive car rental terms and conditions for SL Rentals Hyderabad. Security deposits, driver eligibility, fuel policy, speed limit, and cancellation rules."
+        canonical="/terms"
+        keywords="car rental terms and conditions hyderabad, self drive car deposit policy hyderabad, car hire eligibility hyderabad, cancellation policy car rental hyderabad"
+      />
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -11,9 +19,11 @@ export default function Terms() {
           <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-2xl mb-6">
             <FileText className="w-10 h-10 text-primary" />
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-secondary mb-4 tracking-tight">Terms & Conditions</h1>
-          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-            Please read these important terms and conditions carefully before renting a self-drive car with us.
+          <h1 className="text-3xl md:text-5xl font-black text-secondary mb-4 tracking-tight">
+            Terms & Conditions — SL Self Drive Car Rentals
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            Please read these important rental policies and guidelines carefully before renting a self-drive vehicle in Hyderabad with us.
           </p>
         </div>
 
@@ -128,8 +138,14 @@ export default function Terms() {
 
           </div>
           
-          <div className="bg-gray-50 p-8 text-center border-t border-gray-100">
-            <Link to="/" className="inline-block bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary-hover transition-colors shadow-sm">
+          <div className="bg-gray-50 p-8 text-center border-t border-gray-100 flex flex-wrap items-center justify-center gap-4">
+            <Link to="/fleet" className="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-xl hover:bg-primary-hover transition-colors shadow-sm">
+              <Car size={18} /> View Fleet & Book Now
+            </Link>
+            <Link to="/faq" className="inline-flex items-center gap-2 bg-white text-secondary font-bold py-3 px-6 rounded-xl border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm">
+              <HelpCircle size={18} /> Read FAQ
+            </Link>
+            <Link to="/" className="inline-block text-gray-500 hover:text-secondary font-semibold py-3 px-6">
               Back to Home
             </Link>
           </div>

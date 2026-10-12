@@ -5,6 +5,7 @@ import { useState } from 'react';
 import AuthModal from '../components/auth/AuthModal';
 import BookingModal from '../components/booking/BookingModal';
 import EnquiryModal from '../components/booking/EnquiryModal';
+import SEO from '../components/common/SEO';
 import type { Car } from '../types';
 
 export default function Fleet() {
@@ -41,13 +42,26 @@ export default function Fleet() {
   });
 
   return (
-    <div className="bg-slate-50 min-h-screen py-12">
+    <main className="bg-slate-50 min-h-screen py-12">
+      <SEO 
+        title="Self Drive Cars Fleet in Hyderabad | SUVs, Sedans & 7-Seaters | SL Rentals"
+        description="Browse all self drive cars for rent in Hyderabad starting @ ₹1,800/day. Rent Mahindra Thar, Innova Crysta, Maruti Ertiga, Fronx, Baleno & Swift with doorstep delivery."
+        canonicalPath="/fleet"
+        keywords="self drive cars fleet hyderabad, rent suv hyderabad, 7 seater car rental hyderabad, mahindra thar self drive, innova crysta self drive hyderabad, ertiga rental hyderabad"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header & Filters */}
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold text-secondary mb-4">Our Complete Fleet</h1>
-          <p className="text-gray-500 max-w-2xl mx-auto">Browse our collection of premium vehicles tailored for every occasion and need.</p>
+          <span className="text-primary font-bold tracking-wider uppercase text-xs sm:text-sm mb-2 block">
+            Hyderabad Rental Fleet
+          </span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-secondary mb-3">
+            Self Drive Cars Fleet in Hyderabad
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+            Choose from well-maintained, sanitized SUVs, Sedans, Hatchbacks, and 7-seater MUVs tailored for city drives, weddings, and outstation getaways.
+          </p>
         </div>
 
         <div className="bg-white p-4 rounded-2xl shadow-sm mb-10 flex flex-col md:flex-row gap-4 items-center justify-between border border-gray-100">
@@ -55,10 +69,10 @@ export default function Fleet() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input 
               type="text" 
-              placeholder="Search by car model..." 
+              placeholder="Search by car model (e.g. Thar, Innova)..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
             />
           </div>
           
@@ -90,6 +104,7 @@ export default function Fleet() {
                 </span>
                 <button 
                   onClick={() => toggleWishlist(car.id)}
+                  aria-label={`Save ${car.name} to wishlist`}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                 >
                   <Heart size={24} className={wishlist[car.id] ? "fill-red-500 text-red-500" : ""} />
@@ -99,7 +114,8 @@ export default function Fleet() {
               <div className="h-48 mb-6 flex items-center justify-center overflow-hidden bg-slate-100 rounded-xl">
                 <img 
                   src={car.imageUrl} 
-                  alt={car.name} 
+                  alt={`${car.name} - Self Drive Car Rental in Hyderabad | SL Rentals`}
+                  loading="lazy" 
                   className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
@@ -165,6 +181,6 @@ export default function Fleet() {
         onClose={() => setEnquiryCar(null)}
         car={enquiryCar}
       />
-    </div>
+    </main>
   );
 }

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /profile
+
+Sitemap: https://slcarrentals.in/sitemap.xml

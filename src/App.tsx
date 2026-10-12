@@ -8,9 +8,10 @@ import Services from './pages/Services';
 import Profile from './pages/Profile';
 import Contact from './pages/Contact';
 
+import FAQ from './pages/FAQ';
+
 // Placeholder Pages
 const Team = () => <div className="p-8"><h1 className="text-3xl font-bold">Team</h1></div>;
-const FAQ = () => <div className="p-8"><h1 className="text-3xl font-bold">FAQ</h1></div>;
 
 import Terms from './pages/Terms';
 

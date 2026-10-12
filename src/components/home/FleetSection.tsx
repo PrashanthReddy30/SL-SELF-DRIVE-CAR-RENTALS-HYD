@@ -34,15 +34,15 @@ export default function FleetSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Car Rentals</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-2">Our Top Fleet</h2>
-            <p className="text-gray-500">Comfort, affordability, and convenience</p>
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Available Vehicles</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-2">Top Self Drive Cars for Rent in Hyderabad</h2>
+            <p className="text-gray-600 text-sm sm:text-base">Comfortable, budget-friendly and sanitized hatchbacks, sedans, SUVs & 7-seaters starting @ ₹1,800/day.</p>
           </div>
           <button 
             onClick={() => navigate('/fleet')}
-            className="text-primary font-bold hover:text-primary-hover flex items-center gap-2"
+            className="text-primary font-bold hover:text-primary-hover flex items-center gap-2 text-sm sm:text-base"
           >
-            View All Cars →
+            View All Cars in Hyderabad →
           </button>
         </div>
 
@@ -55,6 +55,7 @@ export default function FleetSection() {
                 </span>
                 <button 
                   onClick={() => toggleWishlist(car.id)}
+                  aria-label={`Save ${car.name} to wishlist`}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                 >
                   <Heart size={24} className={wishlist[car.id] ? "fill-red-500 text-red-500" : ""} />
@@ -64,7 +65,8 @@ export default function FleetSection() {
               <div className="h-48 mb-6 flex items-center justify-center overflow-hidden bg-slate-100 rounded-xl">
                 <img 
                   src={car.imageUrl} 
-                  alt={car.name} 
+                  alt={`${car.name} - Self Drive Car Rental in Hyderabad | SL Rentals`}
+                  loading="lazy" 
                   className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                 />
               </div>

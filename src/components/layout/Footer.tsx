@@ -15,9 +15,9 @@ export default function Footer() {
               </div>
               <span className="font-bold text-2xl">SL Self Drive</span>
             </div>
-            <p className="text-slate-300 font-medium">All Types of Cars Available</p>
+            <p className="text-slate-300 font-medium">Self Drive Car Rentals in Hyderabad</p>
             <p className="text-slate-400 text-sm leading-relaxed mt-4">
-              Experience the best self-drive car rentals with our premium fleet. Affordable, reliable, and convenient.
+              Premium self-drive car rentals across Hyderabad with doorstep delivery, Rajiv Gandhi International Airport pick & drop, sanitized cars, and 24/7 roadside assistance.
             </p>
             <div className="flex items-center gap-4 pt-2">
               <a href="https://instagram.com/sl_car_rentals" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
@@ -61,8 +61,9 @@ export default function Footer() {
                 { name: 'Home', path: '/' },
                 { name: 'Fleet', path: '/fleet' },
                 { name: 'Services', path: '/services' },
-                { name: 'Terms & Conditions', path: '/terms' },
-                { name: 'Privacy Policy', path: '/privacy' }
+                { name: 'FAQs', path: '/faq' },
+                { name: 'Contact Us', path: '/contact' },
+                { name: 'Terms & Conditions', path: '/terms' }
               ].map(item => (
                 <li key={item.name}>
                   <Link to={item.path} className="text-slate-300 hover:text-white flex items-center gap-2 text-sm transition-colors">

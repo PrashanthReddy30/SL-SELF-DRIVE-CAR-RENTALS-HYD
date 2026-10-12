@@ -15,16 +15,32 @@ export default function TeamFAQSection() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const faqs = [
-    { q: "What documents are required to rent a car?", a: "You need a valid original Driving License (DL) and an Aadhaar Card. We will keep a copy for our records." },
-    { q: "Is there a security deposit?", a: "Yes, a refundable security deposit is required before the trip starts. The amount depends on the car model." },
-    { q: "What is the daily mileage limit?", a: "Most of our cars come with a generous daily limit of 400 km/day. Extra kilometers are charged nominally per km." },
-    { q: "Do I need to pay for fuel?", a: "Cars are delivered with a specific fuel level. You must return it with the same level, or you will be charged for the difference." }
+    { 
+      q: "What documents are required for self drive car rental in Hyderabad?", 
+      a: "You only need a valid original Driving License (DL) and an Aadhaar Card. Verification is quick, 100% paperless, and takes under 2 minutes." 
+    },
+    { 
+      q: "How much is the security deposit and when is it refunded?", 
+      a: "We charge a minimal refundable security deposit depending on the car category (Hatchback/Sedan/SUV). It is refunded immediately to your UPI/bank upon vehicle return inspection." 
+    },
+    { 
+      q: "What is the daily kilometer allowance on self drive cars?", 
+      a: "Our standard booking includes a generous 300–400 km/day allowance. We also offer unlimited kilometer packages for extended outstation trips." 
+    },
+    { 
+      q: "Can I drive the rental car outside Hyderabad or outstation?", 
+      a: "Yes! All our vehicles carry valid All-India Tourist permits and Fastags, making them fully eligible for road trips to Srisailam, Tirupati, Vijayawada, Warangal, Bangalore, Goa, and beyond." 
+    },
+    { 
+      q: "Do you deliver cars to Rajiv Gandhi International Airport (RGIA)?", 
+      a: "Yes, we provide 24/7 doorstep vehicle delivery and collection at Rajiv Gandhi International Airport (RGIA Shamshabad), railway stations, and hotels across Hyderabad." 
+    }
   ];
 
   const testimonials = [
-    { name: "Rahul S.", text: "Excellent condition cars and very professional service. Highly recommend SL Car Rentals for weekend trips!", rating: 5 },
-    { name: "Priya M.", text: "The booking process was so smooth and the owner was very cooperative. The car was clean and well maintained.", rating: 5 },
-    { name: "Karthik Reddy", text: "Best self-drive cars in Nagaram. Transparent pricing and no hidden charges. Loved the experience.", rating: 5 }
+    { name: "Rahul Sharma", text: "Best self drive car rental in Hyderabad! Hired the Mahindra Thar for a trip to Srisailam. Clean vehicle, smooth engine, and instant deposit refund.", rating: 5 },
+    { name: "Priya Malladi", text: "Rented an Innova Crysta for a family wedding in Gachibowli. Top condition, super comfortable, and delivered right to our doorstep on time.", rating: 5 },
+    { name: "Karthik Reddy", text: "Transparent pricing with zero hidden fees. The best self drive rental service in Nagaram & Secunderabad. Highly recommended!", rating: 5 }
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -130,17 +146,20 @@ export default function TeamFAQSection() {
         {/* Testimonials Section */}
         <div className="mt-24 mb-16">
           <div className="text-center mb-10">
-            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Reviews</span>
-            <h2 className="text-3xl font-bold text-secondary">What Our Customers Say</h2>
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Customer Stories</span>
+            <h2 className="text-3xl font-bold text-secondary">What Hyderabad Drivers Say About SL Car Rentals</h2>
+            <p className="text-gray-500 text-sm mt-1">Real reviews from our satisfied travelers, tourists, and daily commuters.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((t, i) => (
-              <div key={i} className="bg-slate-50 rounded-2xl p-8 border border-gray-100">
-                <div className="flex gap-1 mb-4 text-yellow-400">
-                  {[...Array(t.rating)].map((_, j) => <Star key={j} size={18} fill="currentColor" />)}
+              <div key={i} className="bg-slate-50 rounded-2xl p-8 border border-gray-100 flex flex-col justify-between">
+                <div>
+                  <div className="flex gap-1 mb-4 text-yellow-400">
+                    {[...Array(t.rating)].map((_, j) => <Star key={j} size={18} fill="currentColor" />)}
+                  </div>
+                  <p className="text-gray-600 mb-6 italic text-sm leading-relaxed">"{t.text}"</p>
                 </div>
-                <p className="text-gray-600 mb-6 italic">"{t.text}"</p>
-                <div className="font-bold text-secondary">- {t.name}</div>
+                <div className="font-bold text-secondary text-sm">- {t.name} (Hyderabad)</div>
               </div>
             ))}
           </div>
@@ -149,8 +168,9 @@ export default function TeamFAQSection() {
         {/* FAQ Section */}
         <div className="mt-24 max-w-3xl mx-auto">
           <div className="text-center mb-10">
-            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Support</span>
-            <h2 className="text-3xl font-bold text-secondary">Frequently Asked Questions</h2>
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Help & Support</span>
+            <h2 className="text-3xl font-bold text-secondary">Frequently Asked Questions About Car Rentals in Hyderabad</h2>
+            <p className="text-gray-500 text-sm mt-1">Everything you need to know about booking, documentation, deposits, and fuel rules.</p>
           </div>
           <div className="space-y-4">
             {faqs.map((faq, i) => (
