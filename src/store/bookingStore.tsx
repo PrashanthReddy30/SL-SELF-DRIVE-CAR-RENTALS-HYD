@@ -58,7 +58,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       }
       isInitialLoad = false;
 
-      const bookingsData = snapshot.docs.map((doc: any) => doc.data() as Booking);
+      const bookingsData = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Booking));
       bookingsData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
       set({ bookings: bookingsData });
@@ -66,7 +66,7 @@ export const useBookingStore = create<BookingState>((set, get) => ({
 
     // Listen to completed bookings separately
     onSnapshot(collection(db, 'completed_bookings'), (snapshot: any) => {
-      const completedData = snapshot.docs.map((doc: any) => doc.data() as Booking);
+      const completedData = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Booking));
       completedData.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
       
       set({ completedBookings: completedData });
@@ -76,7 +76,10 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   },
 
   addBooking: async (booking) => {
-    await setDoc(doc(db, 'bookings', booking.id), booking);
+    const cleanBooking = Object.fromEntries(
+      Object.entries(booking).filter(([_, v]) => v !== undefined)
+    );
+    await setDoc(doc(db, 'bookings', booking.id), cleanBooking);
   },
 
   updateBookingStatus: async (id, status, assignedCarNumber) => {
@@ -118,7 +121,10 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   },
 
   updateBookingDetails: async (id, updates) => {
-    await updateDoc(doc(db, 'bookings', id), updates);
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
+    );
+    await updateDoc(doc(db, 'bookings', id), cleanUpdates);
   },
 
   cancelBooking: async (id) => {
