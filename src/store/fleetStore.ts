@@ -118,19 +118,30 @@ export const useFleetStore = create<FleetState>((set, get) => ({
     }
 
     onSnapshot(carsRef, (snapshot: any) => {
-      const carsData = snapshot.docs.map((doc: any) => doc.data() as Car);
+      const carsData = snapshot.docs.map((doc: any) => ({
+        id: doc.id,
+        ...doc.data()
+      } as Car));
       set({ cars: carsData });
+    }, (error) => {
+      console.error('Error listening to cars collection:', error);
     });
 
     set({ isInitialized: true });
   },
 
   addCar: async (car) => {
-    await setDoc(doc(db, 'cars', car.id), car);
+    const cleanData = Object.fromEntries(
+      Object.entries(car).filter(([_, v]) => v !== undefined)
+    );
+    await setDoc(doc(db, 'cars', car.id), cleanData);
   },
 
   updateCar: async (id, updatedFields) => {
-    await updateDoc(doc(db, 'cars', id), updatedFields as any);
+    const cleanFields = Object.fromEntries(
+      Object.entries(updatedFields).filter(([_, v]) => v !== undefined)
+    );
+    await updateDoc(doc(db, 'cars', id), cleanFields);
   },
 
   deleteCar: async (id) => {

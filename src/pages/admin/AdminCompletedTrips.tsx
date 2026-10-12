@@ -12,9 +12,11 @@ export default function AdminCompletedTrips() {
   const [filterOwner, setFilterOwner] = useState('');
   const [commissionPct, setCommissionPct] = useState<number>(30); // Admin commission percentage
 
-  const uniqueOwners = Array.from(new Set(cars.flatMap(c => 
-    c.carNumbers?.map(cn => typeof cn === 'string' ? '' : cn.owner).filter(Boolean) || []
-  )));
+  const uniqueOwners = Array.from(new Set(cars.flatMap(c => {
+    const list = c.carNumbers?.map(cn => typeof cn === 'string' ? '' : cn.owner).filter(Boolean) || [];
+    if (c.owner) list.push(c.owner);
+    return list;
+  })));
 
   const completedTrips = completedBookings;
 
@@ -28,10 +30,10 @@ export default function AdminCompletedTrips() {
     if (filterOwner) {
       const car = cars.find(c => c.id === b.carId);
       const carNumber = b.carNumber || car?.carNumber;
-      let ownerName = '';
+      let ownerName = car?.owner || '';
       if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
         const regObj = (car.carNumbers as any[]).find(cn => cn.number === carNumber);
-        if (regObj) ownerName = regObj.owner;
+        if (regObj?.owner) ownerName = regObj.owner;
       }
       if (ownerName.toLowerCase() !== filterOwner.toLowerCase()) return false;
     }
@@ -54,10 +56,10 @@ export default function AdminCompletedTrips() {
       const car = cars.find(c => c.id === b.carId);
       const carName = b.carName || car?.name || 'Unknown';
       const carNumber = b.carNumber || car?.carNumber;
-      let ownerName = '';
+      let ownerName = car?.owner || '';
       if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
         const regObj = (car.carNumbers as any[]).find(cn => cn.number === carNumber);
-        if (regObj) ownerName = regObj.owner;
+        if (regObj?.owner) ownerName = regObj.owner;
       }
       const carDisplayName = carNumber ? `${carName} - ${carNumber}${ownerName ? ` (${ownerName})` : ''}` : carName;
       const durationDiff = new Date(b.endDate).getTime() - new Date(b.startDate).getTime();
@@ -193,10 +195,10 @@ export default function AdminCompletedTrips() {
                   const car = cars.find(c => c.id === b.carId);
                   const carName = b.carName || car?.name || 'Unknown';
                   const carNumber = b.carNumber || car?.carNumber;
-                  let ownerName = '';
+                  let ownerName = car?.owner || '';
                   if (car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
                     const regObj = (car.carNumbers as any[]).find(cn => cn.number === carNumber);
-                    if (regObj) ownerName = regObj.owner;
+                    if (regObj?.owner) ownerName = regObj.owner;
                   }
                   
                   return (

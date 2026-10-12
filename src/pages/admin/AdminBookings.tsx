@@ -257,7 +257,7 @@ export default function AdminBookings() {
                     </td>
                     {(() => {
                       const car = cars.find(c => c.id === b.carId);
-                      let ownerName = '-';
+                      let ownerName = car?.owner || '-';
                       if (b.carNumber && car?.carNumbers && typeof car.carNumbers[0] !== 'string') {
                         const regObj = (car.carNumbers as any[]).find(cn => cn.number === b.carNumber);
                         if (regObj && regObj.owner) ownerName = regObj.owner;

@@ -24,6 +24,10 @@ export interface Car {
   id: string;
   name: string;
   carNumber?: string;
+  registrationNumber?: string;
+  regNo?: string;
+  owner?: string;
+  ownerPhone?: string;
   carNumbers?: CarRegistration[];
   category: CarCategory;
   transmission: Transmission;
